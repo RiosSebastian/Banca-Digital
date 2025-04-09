@@ -1,6 +1,6 @@
 package com.example.SpringSegurity.entity;
 
-import com.example.SpringSegurity.util.UserEnum;
+import com.example.SpringSegurity.util.TipoTransaccion;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,24 +12,24 @@ import java.time.LocalDateTime;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserEntity {
+public class TransaccionEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String nombre;
+    private Double monto;
 
-    @Column(nullable = false)
-    private String password;
-
-
-    @Column(unique = true)
-    private String email;
+    private LocalDateTime fecha;
 
     @Enumerated(EnumType.STRING)
-    private UserEnum userEnum;
+    private TipoTransaccion tipo;
 
-   private LocalDateTime  fechaRegistro;
+    @ManyToOne
+    private CuentaEntity cuentaOrigen;
+
+    @ManyToOne
+    private CuentaEntity cuentaDestino;
 
 
 }

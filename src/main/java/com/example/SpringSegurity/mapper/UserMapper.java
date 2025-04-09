@@ -5,7 +5,7 @@ import com.example.SpringSegurity.entity.UserEntity;
 
 public class UserMapper {
     public static UserDTORes toDTO(UserEntity userEntity){
-        return new UserDTORes(userEntity.getId(), userEntity.getName(), userEntity.getBalance(), userEntity.getEmail(),userEntity.getUserEnum().toString());
+        return new UserDTORes(userEntity.getId(), userEntity.getNombre(), userEntity.getEmail(),userEntity.getUserEnum().toString());
     }
 
 }
