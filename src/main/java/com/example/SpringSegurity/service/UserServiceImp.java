@@ -2,6 +2,7 @@ package com.example.SpringSegurity.service;
 
 import com.example.SpringSegurity.dto.UserDTOReq;
 import com.example.SpringSegurity.dto.UserDTORes;
+import com.example.SpringSegurity.entity.UserEntity;
 import com.example.SpringSegurity.mapper.UserMapper;
 import com.example.SpringSegurity.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserServiceImp implements UserService{
     private final UserRepository userRepository;
-
+    private UserMapper modelMapper;
     @Override
     public UserDTORes getUser(Long id) {
 
@@ -22,7 +23,8 @@ public class UserServiceImp implements UserService{
 
     @Override
     public UserDTORes createUsuario(UserDTOReq userDTOReq) {
-        return null;
+
+        UserEntity usuario = UserMapper.toUserEntity(userDTOReq);
     }
 
     @Override
