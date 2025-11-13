@@ -1,4 +1,4 @@
-package com.example.SpringSegurity.dto;
+package com.example.SpringSegurity.dto.dtoReq;
 
 import com.example.SpringSegurity.util.Estado;
 import com.example.SpringSegurity.util.TipoTransaccion;

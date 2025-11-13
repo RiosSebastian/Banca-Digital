@@ -1,4 +1,4 @@
-package com.example.SpringSegurity.dto;
+package com.example.SpringSegurity.dto.dtoReq;
 
 import io.micrometer.common.lang.NonNull;
 import jakarta.validation.constraints.Email;

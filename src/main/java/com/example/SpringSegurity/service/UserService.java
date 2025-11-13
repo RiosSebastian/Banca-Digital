@@ -1,6 +1,6 @@
 package com.example.SpringSegurity.service;
 
-import com.example.SpringSegurity.dto.UserDTOReq;
+import com.example.SpringSegurity.dto.dtoReq.UserDTOReq;
 import com.example.SpringSegurity.dto.UserDTORes;
 
 import java.util.List;

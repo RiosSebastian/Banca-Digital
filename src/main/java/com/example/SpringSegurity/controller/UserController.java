@@ -1,6 +1,6 @@
 package com.example.SpringSegurity.controller;
 
-import com.example.SpringSegurity.dto.UserDTOReq;
+import com.example.SpringSegurity.dto.dtoReq.UserDTOReq;
 import com.example.SpringSegurity.dto.UserDTORes;
 import com.example.SpringSegurity.entity.AccountEntity;
 import com.example.SpringSegurity.entity.UserEntity;
@@ -9,7 +9,6 @@ import com.example.SpringSegurity.repository.UserRepository;
 import com.example.SpringSegurity.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
