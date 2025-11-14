@@ -2,7 +2,6 @@ package com.example.SpringSegurity.service;
 
 import com.example.SpringSegurity.dto.TransaccionDtoRes;
 import com.example.SpringSegurity.dto.dtoReq.TransaccionDtoReq;
-import com.example.SpringSegurity.entity.CuentaEntity;
 import com.example.SpringSegurity.util.TipoTransaccion;
 
 import java.time.LocalDateTime;

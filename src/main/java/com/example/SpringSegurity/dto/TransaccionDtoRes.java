@@ -1,6 +1,5 @@
 package com.example.SpringSegurity.dto;
 
-import com.example.SpringSegurity.entity.CuentaEntity;
 import com.example.SpringSegurity.util.TipoTransaccion;
 import lombok.Builder;
 
