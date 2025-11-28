@@ -9,6 +9,7 @@ import com.example.SpringSegurity.repository.UserRepository;
 import com.example.SpringSegurity.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -33,21 +34,12 @@ public class UserController {
     }
 
     //crear usuario
-    public UserDTORes createUsuario(UserDTOReq userDTOReq) {
-        UserEntity user = UserEntity.builder()
-                .nombre(userDTOReq.name())
-                .email(userDTOReq.email())
-                .password(passwordEncoder.encode(userDTOReq.password()))
-                .userEnum(userDTOReq.userEnum())
-                .build();
-
-        userRepository.save(user);
-
-        AccountEntity account = new AccountEntity();
-        account.setNombre(user);
-        accountRepository.save(account);
-
-        return mapToDTO(user); // devolver DTO que incluya cuenta
+    // Crear un nuevo usuario
+    @PostMapping
+    public ResponseEntity<UserDTORes> createUser(@Valid @RequestBody UserDTOReq userDTOReq) {
+        System.out.println(userDTOReq);
+        UserDTORes createdUser = userService.createUser(userDTOReq);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
 

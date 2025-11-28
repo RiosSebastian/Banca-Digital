@@ -26,10 +26,10 @@ public class TransaccionEntity {
     private TipoTransaccion tipo;
 
     @ManyToOne
-    private CuentaEntity cuentaOrigen;
+    private AccountEntity cuentaOrigen;
 
     @ManyToOne
-    private CuentaEntity cuentaDestino;
+    private AccountEntity cuentaDestino;
 
 
 }

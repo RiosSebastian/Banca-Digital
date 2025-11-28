@@ -6,6 +6,6 @@ import com.example.SpringSegurity.entity.TransaccionEntity;
 public class TransaccionMapper {
 
     public static TransaccionDtoRes toDto(TransaccionEntity transaccionEntity){
-        return new TransaccionDtoRes( transaccionEntity.getFecha(),transaccionEntity.getTipo() )
+        return new TransaccionDtoRes( transaccionEntity.getFecha(),transaccionEntity.getTipo() );
     }
 }

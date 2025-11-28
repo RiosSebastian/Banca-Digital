@@ -6,9 +6,8 @@ import lombok.Builder;
 import java.time.LocalDateTime;
 
 @Builder
-public record TransaccionDtoRes(Double monto,
-                                LocalDateTime fecha,
-                                TipoTransaccion tipo,
-                                CuentaEntity cuentaOrigen,
-                                CuentaEntity cuentaDestino) {
+public record TransaccionDtoRes(
+        LocalDateTime fecha,
+                                TipoTransaccion tipo
+) {
 }

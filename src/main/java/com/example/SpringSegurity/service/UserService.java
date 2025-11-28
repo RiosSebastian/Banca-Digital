@@ -8,7 +8,7 @@ import java.util.List;
 public interface UserService {
     public UserDTORes getUser(Long id);
 
-    UserDTORes createUsuario(UserDTOReq userDTOReq);
+    UserDTORes createUser(UserDTOReq userDTOReq);
 
     // Firma del método para obtener un usuario por su ID
     UserDTORes getUserById(Long id);
@@ -22,5 +22,6 @@ public interface UserService {
     // Firma del método para obtener todos los usuarios
     List<UserDTORes>getAllUser();
     UserDTORes updateProfileImage(Long id, String imageUrl);
+
 
 }
