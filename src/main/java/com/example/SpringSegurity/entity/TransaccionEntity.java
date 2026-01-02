@@ -26,6 +26,10 @@ public class TransaccionEntity {
     private TipoTransaccion tipo;
 
     @ManyToOne
+    @JoinColumn(name = "account_id")
+    private AccountEntity account;
+
+    @ManyToOne
     private AccountEntity cuentaOrigen;
 
     @ManyToOne

@@ -5,7 +5,7 @@ import com.example.SpringSegurity.dto.dtoReq.AccountDtoReq;
 import com.example.SpringSegurity.entity.AccountEntity;
 
 public class AccountMapper {
-    public static AccountDtoRes toDto(AccountEntity accountEntity){
+    public  AccountDtoRes toDto(AccountEntity accountEntity){
         return AccountDtoRes.builder()
                 .user(accountEntity.getUser())
                 .cbu(accountEntity.getCbu())

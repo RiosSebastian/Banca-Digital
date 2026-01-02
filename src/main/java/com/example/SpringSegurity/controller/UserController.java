@@ -9,6 +9,7 @@ import com.example.SpringSegurity.repository.UserRepository;
 import com.example.SpringSegurity.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -45,7 +46,7 @@ public class UserController {
 
     //actualizar libro
     @PutMapping
-    public ResponseEntity<UserDTORes>updateUser(@PathVariable Long id, @Valid @RequestBody UserDTOReq userDTOReq){
+    public ResponseEntity<UserDTORes>updateUser(@PathVariable Long id, @Valid @RequestBody UserDTOReq userDTOReq) throws ChangeSetPersister.NotFoundException {
         UserDTORes updatedUser = userService.updateUser(id, userDTOReq);
         return ResponseEntity.ok(updatedUser);
     }
@@ -53,7 +54,7 @@ public class UserController {
     // Eliminar un usuario por ID
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteUser(@PathVariable Long id) throws ChangeSetPersister.NotFoundException {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }

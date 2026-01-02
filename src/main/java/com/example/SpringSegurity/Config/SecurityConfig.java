@@ -2,6 +2,7 @@ package com.example.SpringSegurity.Config;
 
 import com.example.SpringSegurity.util.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.filter.CorsFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

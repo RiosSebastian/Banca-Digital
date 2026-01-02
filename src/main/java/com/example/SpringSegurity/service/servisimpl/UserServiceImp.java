@@ -27,7 +27,7 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public UserDTORes createUsuario(UserDTOReq userDTOReq) {
+    public UserDTORes createUser(UserDTOReq userDTOReq) {
 
         UserEntity usuario = UserMapper.toUserEntity(userDTOReq);
         usuario = userRepository.save(usuario);
@@ -42,7 +42,7 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public UserDTORes updateUser(Long id, UserDTOReq userDTOReq) {
+    public UserDTORes updateUser(Long id, UserDTOReq userDTOReq) throws ChangeSetPersister.NotFoundException {
         UserEntity existeUser = userRepository.findById(id)
                 .orElseThrow(()-> new ChangeSetPersister.NotFoundException());
         existeUser.setNombre(userDTOReq.name());
@@ -55,10 +55,13 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public void deleteUser(Long id)throws ChangeSetPersister.NotFoundException  {
-        UserEntity user = userRepository.findById(id).orElseThrow(()-> new ChangeSetPersister.NotFoundException());
+    public void deleteUser(Long id) throws ChangeSetPersister.NotFoundException {
+        UserEntity user = userRepository.findById(id)
+                .orElseThrow(ChangeSetPersister.NotFoundException::new);
+
         userRepository.delete(user);
     }
+
 
     @Override
     public List<UserDTORes> getAllUser() {

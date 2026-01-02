@@ -23,7 +23,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public AccountDtoRes createAccount(AccountDtoReq dto) {
-        UserEntity user = userRepository.findById(dto.getUserId())
+        UserEntity user = userRepository.findById(dto.user().getId())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         AccountEntity account = new AccountEntity();
@@ -41,7 +41,7 @@ public class AccountServiceImpl implements AccountService {
         AccountEntity account = accountRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Account not found"));
 
-        account.setAlias(dto.getAlias());
+        account.setAlias(dto.alias());
         return accountMapper.toDto(accountRepository.save(account));
     }
 

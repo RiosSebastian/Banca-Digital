@@ -29,8 +29,8 @@ import java.util.UUID;
         @OneToOne
         private UserEntity user;
 
-    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
-    private List<TransaccionEntity> transacciones = new ArrayList<>();
+    @OneToMany(mappedBy = "account")
+    private List<TransaccionEntity> transacciones;
 
     @PrePersist
         public void generateAliasAndCBU() {

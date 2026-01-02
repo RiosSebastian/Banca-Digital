@@ -5,5 +5,6 @@ import com.example.SpringSegurity.entity.UserEntity;
 public record AccountDtoReq(String alias,
                             String cbu,
                             Double balance,
-                            UserEntity user) {
+                            UserEntity user,
+                            UserEntity id) {
 }
