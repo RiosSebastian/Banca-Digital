@@ -1,104 +1,142 @@
-🏥 Sistema de Gestión Hospitalaria – Spring Boot API
+🏦 Digital Banking API – Spring Boot
 
-API REST desarrollada con Spring Boot para la gestión integral de un sistema hospitalario.
-Permite administrar pacientes, doctores, especialidades, turnos médicos, camas y análisis clínicos, incorporando seguridad con JWT y arquitectura en capas.
-----------------------------------------------------------------------------
-🚀 Tecnologías Utilizadas
+Backend de una plataforma de banca digital desarrollada con Spring Boot, que implementa autenticación segura mediante JWT, gestión de usuarios con roles, cuentas bancarias y transacciones financieras.
 
-Java 17+
-
-Spring Boot
-
-Spring Web
-
-Spring Data JPA
-
-Spring Security + JWT
-
-Hibernate
-
-Swagger / OpenAPI
-
-Lombok
-
-H2 / MySQL (configurable)
-
-Maven
+El proyecto sigue buenas prácticas de arquitectura, uso de DTOs, mappers, manejo global de excepciones y seguridad stateless.
 
 -------------------------------------------------------------------------
-📐 Arquitectura del Proyecto
+🚀 Tecnologías utilizadas
 
-El proyecto sigue una arquitectura en capas:
-Controller: expone endpoints REST
+☕ Java 17+
 
-Service: lógica de negocio
+🌱 Spring Boot
 
-Repository: acceso a datos (JPA)
+🔐 Spring Security + JWT
 
-DTOs: separación entre API y modelo
+🗄️ Spring Data JPA / Hibernate
 
-Mappers: conversión Entity ↔ DTO
+🐘 Base de datos relacional (MySQL / H2)
 
-Security: autenticación con JWT
+🧾 DTO + Mapper Pattern
 
------------------------------------------------------------------------
-🧩 Módulos del Sistema
-👤 Pacientes
+🧪 Validaciones con Jakarta Validation
 
-Crear, actualizar y eliminar pacientes
+📦 Lombok
 
-Búsqueda por DNI, nombre, teléfono, email
+📖 Swagger / OpenAPI
+
+🌍 CORS configurado para frontend React
+
+------------------------------------------------------------------------
+🔐 Seguridad
+
+Autenticación basada en JWT
+
+Autorización por roles:
+
+ADMIN
+
+USER
+
+INVITED
+
+Uso de @PreAuthorize para control de acceso
+
+Sesiones STATELESS
+
+Filtro personalizado JwtAuthenticationFilter
 
 Contraseñas encriptadas con BCrypt
 
-👨‍⚕️ Doctores
+------------------------------------------------------------------------
+👤 Gestión de Usuarios
 
-Alta, baja y modificación de doctores
+Funcionalidades:
 
-Asociación con especialidades
+Crear usuario
 
-Consulta por especialidad
+Obtener usuario por ID
 
-🧠 Especialidades
+Listar usuarios (solo ADMIN)
 
-CRUD completo
+Actualizar usuario
 
-Relación uno a muchos con doctores
+Eliminar usuario (solo ADMIN)
 
-📅 Turnos
+Roles asignados mediante UserEnum.
 
-Crear, actualizar y cancelar turnos
+💳 Gestión de Cuentas
 
-Estados: RESERVADO, CANCELADO, COMPLETADO
+Creación automática de:
 
-Filtros dinámicos por paciente, doctor, fecha y estado
+Alias
 
-🛏️ Camas
+CBU
 
-Administración de camas hospitalarias
+Balance inicial
 
-Estados: DISPONIBLE, OCUPADA, MANTENIMIENTO
+Relación 1:1 entre Usuario y Cuenta
 
-Asignación y liberación de camas
+Eliminación y listado de cuentas
 
-🧪 Análisis Clínicos
+💸 Transacciones
 
-Registro de análisis por paciente
+Tipos de transacciones soportadas:
 
-Eliminación y consulta por paciente
+DEPOSITO
+
+RETIRO
+
+TRANSFERENCIA
+
+Cada transacción queda registrada con:
+
+Fecha
+
+Monto
+
+Tipo
+
+Cuenta origen / destino
+--------------------------------------------------------------
+📦 Arquitectura del Proyecto
+src/main/java
+├── config          # Seguridad, JWT, CORS
+├── controller      # Controladores REST
+├── dto             # DTOs Request / Response
+├── entity          # Entidades JPA
+├── exception       # Excepciones personalizadas
+├── mapper          # Conversión Entity ↔ DTO
+├── repository      # Repositorios JPA
+├── service         # Lógica de negocio
+└── security        # Filtros y utilidades JWT
 
 --------------------------------------------------------
+⚠️ Manejo de Excepciones
 
-📌 Próximas Mejoras
+Se implementa un GlobalExceptionHandler que captura:
 
-Roles (ADMIN, DOCTOR, PACIENTE)
+Recurso no encontrado (404)
 
-Tests unitarios e integración
+Datos inválidos (400)
 
-Manejo global de excepciones
+Credenciales incorrectas (401)
 
-Auditoría (createdAt, updatedAt)
+Conflictos (409)
 
-Paginación y ordenamiento
+Errores internos (500)
 
-Dockerización
+Todas las respuestas siguen un formato estándar con timestamp y detalles.
+
+------------------------------------------------------------
+🧠 Próximas mejoras
+
+🔄 Refresh Token
+
+🍪 JWT en Cookies HttpOnly
+
+📊 Historial de movimientos paginado
+
+🧪 Tests unitarios y de integración
+
+📱 Integración con frontend React
