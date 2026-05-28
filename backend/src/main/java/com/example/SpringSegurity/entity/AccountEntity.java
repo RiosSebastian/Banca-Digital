@@ -32,7 +32,7 @@ import java.util.UUID;
     @OneToMany(mappedBy = "account")
     private List<TransaccionEntity> transacciones;
 
-    @PrePersist
+    /*@PrePersist
     public void generateAliasAndCBU() {
         // Verificación de seguridad
         String nombre = (user != null && user.getNombre() != null) ? user.getNombre() : "usuario";
@@ -46,7 +46,7 @@ import java.util.UUID;
         String base = name.toLowerCase().replaceAll("\\s+", ".") +
                 "." + UUID.randomUUID().toString().substring(0, 5);
         return base;
-    }
+    }*/
 
     private String generateCBU() {
         return String.format("%022d", Math.abs(new Random().nextLong()) % 1_000_000_000_000_000_000L);

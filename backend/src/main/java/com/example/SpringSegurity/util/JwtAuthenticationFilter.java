@@ -1,13 +1,12 @@
 package com.example.SpringSegurity.util;
 
 
-import com.example.SpringSegurity.service.servisimpl.JwtUtil;
+import com.example.SpringSegurity.service.JwtUtil;
 import io.micrometer.common.lang.NonNull;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -40,7 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String authorization = request.getHeader("Authorization");
             if (authorization != null && authorization.startsWith("Bearer ")) {
                 String token = authorization.substring(7);
-                String subject = jwtUtil.validateAndGetSubject(token);
+                String subject = jwtUtil.validateToken(token);
                 UserDetails user = userDetailsService.loadUserByUsername(subject);
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         user,

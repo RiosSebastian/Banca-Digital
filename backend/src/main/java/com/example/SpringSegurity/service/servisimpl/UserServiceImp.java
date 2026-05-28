@@ -40,7 +40,7 @@ public class UserServiceImp implements UserService {
 
     @Override
     public UserDTORes createUser(UserDTOReq dto) {
-        UserEntity user = userMapper.toUserEntity(dto);
+        UserEntity user = userMapper.toEntity(dto);
 
         user.setPassword(passwordEncoder.encode(dto.password()));
 
@@ -51,7 +51,7 @@ public class UserServiceImp implements UserService {
     public UserDTORes getUserById(Long id) {
         UserEntity user = userRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("El usuario con ID: " + id + "no fue encontrado"));
-        return UserMapper.toDTO(user);
+        return userMapper.toDTO(user);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class UserServiceImp implements UserService {
         existeUser.setUserEnum(UserEnum.valueOf(userDTOReq.userEnum()));
 
         existeUser = userRepository.save(existeUser);
-        return  UserMapper.toDTO(existeUser);
+        return userMapper.toDTO(existeUser);
     }
 
     @Override

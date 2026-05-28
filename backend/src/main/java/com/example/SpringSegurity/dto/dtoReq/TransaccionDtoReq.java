@@ -4,7 +4,11 @@ import com.example.SpringSegurity.util.TipoTransaccion;
 
 import java.time.LocalDateTime;
 
-public record TransaccionDtoReq( Long cuentaOrigenId,
-                                 Long cuentaDestinoId,
-                                 Double monto) {
+public record TransaccionDtoReq(
+        Long cuentaId,
+        Long cuentaOrigenId,
+        Long cuentaDestinoId,
+        Double monto,
+        TipoTransaccion tipo
+) {
 }

@@ -40,13 +40,16 @@ public class AccountServiceImpl implements AccountService {
         return accountMapper.toDto(account);
     }
 
+
     @Override
     public AccountDtoRes updateAccount(Long id, AccountDtoReq dto) {
+
         AccountEntity account = accountRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Account not found"));
 
-        account.setAlias(dto.alias());
-        return accountMapper.toDto(accountRepository.save(account));
+        return accountMapper.toDto(
+                accountRepository.save(account)
+        );
     }
 
     @Override

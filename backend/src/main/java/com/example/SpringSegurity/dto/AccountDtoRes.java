@@ -10,6 +10,6 @@ import java.util.List;
 public record AccountDtoRes(String alias,
                             String cbu,
                             Double balance,
-                            UserEntity user
+                            Long userId
                             ) {
 }

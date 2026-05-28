@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -47,5 +48,35 @@ public class TransaccionServiceImpl implements TransaccionService {
         transaccionRepository.save(tx);
 
         return new TransaccionDtoRes(tx.getFecha(), tx.getTipo());
+    }
+
+    @Override
+    public TransaccionDtoRes updateTransaccion(Double monto, TipoTransaccion tipo, AccountEntity cuentaDestino) {
+        return null;
+    }
+
+    @Override
+    public void deleteTransaccion(Long id) {
+
+    }
+
+    @Override
+    public List<TransaccionDtoRes> getAllTransaccion() {
+        return List.of();
+    }
+
+    @Override
+    public List<TransaccionDtoRes> listTransaccionMonto(Double monto) {
+        return List.of();
+    }
+
+    @Override
+    public List<TransaccionDtoRes> listTransaccionfecha(LocalDateTime fecha) {
+        return List.of();
+    }
+
+    @Override
+    public List<TransaccionDtoRes> listTransaccionTipo(TipoTransaccion tipo) {
+        return List.of();
     }
 }

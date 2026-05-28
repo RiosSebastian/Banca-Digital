@@ -1,5 +1,7 @@
 package com.example.SpringSegurity.controller;
 
+import com.example.SpringSegurity.dto.LoginDtoRes;
+import com.example.SpringSegurity.dto.dtoReq.LoginDtoReq;
 import com.example.SpringSegurity.service.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -11,10 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
-
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -22,7 +22,9 @@ public class AuthController {
     private final JwtUtil jwtUtil;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest req) {
+    public ResponseEntity<LoginDtoRes> login(
+            @RequestBody LoginDtoReq req
+    ) {
 
         Authentication auth = authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -33,6 +35,8 @@ public class AuthController {
 
         String token = jwtUtil.generateToken(req.email());
 
-        return ResponseEntity.ok(Map.of("token", token));
+        return ResponseEntity.ok(
+                new LoginDtoRes(token)
+        );
     }
 }

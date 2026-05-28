@@ -13,7 +13,7 @@ public class AccountMapper {
                 .alias(account.getAlias())
                 .cbu(account.getCbu())
                 .balance(account.getBalance())
-                .user(account.getUser().getId()) // SOLO ID
+                .userId(account.getUser().getId()) // SOLO ID
                 .build();
     }
 }
