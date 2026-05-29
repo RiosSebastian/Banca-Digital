@@ -1,9 +1,7 @@
-package com.example.SpringSegurity.Config;
+package com.example.SpringSegurity.security;
 
-import com.example.SpringSegurity.util.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.filter.CorsFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -68,7 +66,7 @@ public class SecurityConfig {
     public CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration corsConfig = new CorsConfiguration();
-        corsConfig.setAllowedOrigins(List.of("https://c21-02-ft-java-react-frontend-qw2s.onrender.com", "http://localhost:3000", "http://127.0.0.1:3000")); // Origen permitido
+        corsConfig.setAllowedOrigins(List.of("http://localhost:3000", "http://127.0.0.1:3000")); // Origen permitido
         corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Métodos permitidos
         corsConfig.setAllowedHeaders(List.of("Authorization", "Content-Type", "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")); // Cabeceras permitidas
         corsConfig.setAllowCredentials(true); // Permitir credenciales (si es necesario)

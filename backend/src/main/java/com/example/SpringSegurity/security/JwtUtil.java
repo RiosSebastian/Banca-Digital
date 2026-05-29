@@ -1,4 +1,4 @@
-package com.example.SpringSegurity.service;
+package com.example.SpringSegurity.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -18,6 +18,7 @@ public class JwtUtil {
     private Long expiration;
 
     public String generateToken(String username) {
+
 
         return JWT.create()
                 .withIssuer("bank-app")

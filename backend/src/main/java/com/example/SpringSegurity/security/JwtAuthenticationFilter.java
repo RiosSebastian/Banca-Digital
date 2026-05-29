@@ -1,7 +1,6 @@
-package com.example.SpringSegurity.util;
+package com.example.SpringSegurity.security;
 
 
-import com.example.SpringSegurity.service.JwtUtil;
 import io.micrometer.common.lang.NonNull;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
