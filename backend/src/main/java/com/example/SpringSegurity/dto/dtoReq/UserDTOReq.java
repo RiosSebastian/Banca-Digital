@@ -1,5 +1,7 @@
 package com.example.SpringSegurity.dto.dtoReq;
 
+import com.example.SpringSegurity.validation.annotation.UniqueEmail;
+import com.example.SpringSegurity.validation.annotation.ValidRole;
 import io.micrometer.common.lang.NonNull;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
@@ -16,7 +18,8 @@ public record UserDTOReq(@NonNull
 
                          float balance,
                          @NonNull
-                         @Email
+                         @UniqueEmail
                          String email,
+                         @ValidRole
                          String userEnum) {
 }

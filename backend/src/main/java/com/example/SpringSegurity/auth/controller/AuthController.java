@@ -9,6 +9,10 @@ import com.example.SpringSegurity.auth.entity.RefreshTokenEntity;
 import com.example.SpringSegurity.auth.service.AuthService;
 import com.example.SpringSegurity.auth.service.RefreshTokenService;
 import com.example.SpringSegurity.dto.UserDTORes;
+import com.example.SpringSegurity.security.JwtUtil;
+import com.example.SpringSegurity.util.ResponseBuilder;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,17 +22,24 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@Tag(name = "Autenticación", description = "Endpoints de autenticación")
 public class AuthController {
 
     private final AuthService authService;
     private final RefreshTokenService refreshTokenService;
+    private final JwtUtil jwtUtil;
 
+    @Operation(summary = "Iniciar sesión")
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(
             @Valid @RequestBody LoginRequest request
     ) {
 
-        return ResponseEntity.ok(authService.login(request));
+        return ResponseEntity.ok(
+                ResponseBuilder.success(
+                        "Login exitoso",
+                        authService.login(request)
+                ).data());
     }
 
     @PostMapping("/register")
@@ -36,8 +47,7 @@ public class AuthController {
             @Valid @RequestBody RegisterRequest request
     ) {
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
+        return ResponseEntity.status(HttpStatus.CREATED)
                 .body(authService.register(request));
     }
     @PostMapping("/refresh")

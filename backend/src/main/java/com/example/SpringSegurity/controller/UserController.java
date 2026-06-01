@@ -1,5 +1,6 @@
 package com.example.SpringSegurity.controller;
 
+import com.example.SpringSegurity.dto.ApiResponse;
 import com.example.SpringSegurity.dto.dtoReq.UserDTOReq;
 import com.example.SpringSegurity.dto.UserDTORes;
 import com.example.SpringSegurity.entity.AccountEntity;
@@ -7,6 +8,7 @@ import com.example.SpringSegurity.entity.UserEntity;
 import com.example.SpringSegurity.repository.AccountRepository;
 import com.example.SpringSegurity.repository.UserRepository;
 import com.example.SpringSegurity.service.UserService;
+import com.example.SpringSegurity.util.ResponseBuilder;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.crossstore.ChangeSetPersister;
@@ -28,10 +30,16 @@ public class UserController {
 
     // Buscar usuario por ID
     @GetMapping("/{id}")
-    public ResponseEntity<UserDTORes> findOneById(@PathVariable Long id) {
-        UserDTORes usuario = userService.getUser(id);
+    public ResponseEntity<ApiResponse<UserDTORes>> getUser(
+            @PathVariable Long id
+    ) {
 
-        return ResponseEntity.ok(usuario);
+        return ResponseEntity.ok(
+                ResponseBuilder.success(
+                        "Usuario encontrado",
+                        userService.getUser(id)
+                )
+        );
     }
 
     //crear usuario

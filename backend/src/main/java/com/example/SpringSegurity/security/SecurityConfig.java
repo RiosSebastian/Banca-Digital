@@ -43,8 +43,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
                                 // 2. Ajusta las rutas (¿tienen /api o no?)
-                                .requestMatchers(HttpMethod.POST, "/api/auth/login", "/api/users").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
+                                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                                 // 3. Rutas protegidas
                                 .requestMatchers("/api/v1/rooms/**").authenticated()
                                 .anyRequest().authenticated())
