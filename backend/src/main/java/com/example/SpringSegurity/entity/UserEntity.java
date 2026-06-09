@@ -1,5 +1,6 @@
 package com.example.SpringSegurity.entity;
 
+import com.example.SpringSegurity.util.Estado;
 import com.example.SpringSegurity.util.UserEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -36,7 +37,14 @@ public class UserEntity implements UserDetails {
     @Enumerated(EnumType.STRING)
     private UserEnum userEnum;
 
+    @Enumerated(EnumType.STRING)
+    private Estado estado;
+
    private LocalDateTime  fechaRegistro;
+
+    private Integer failedLoginAttempts = 0;
+
+    private LocalDateTime blockedUntil;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

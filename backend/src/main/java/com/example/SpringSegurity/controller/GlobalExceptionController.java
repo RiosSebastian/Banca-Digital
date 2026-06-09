@@ -1,8 +1,7 @@
 package com.example.SpringSegurity.controller;
 
 import com.example.SpringSegurity.dto.ErrorDtoRes;
-import com.example.SpringSegurity.exceptions.DuplicatedException;
-import com.example.SpringSegurity.exceptions.NotFoundException;
+import com.example.SpringSegurity.exceptions.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -109,6 +108,98 @@ public class GlobalExceptionController {
         ));
     }
 
-    // Otros manejadores (HttpMessageNotReadable, HttpMediaTypeNotSupported, etc.)
-    // seguirían el mismo patrón de usar getCurrentTimestamp()
+    @ExceptionHandler(InsufficientBalanceException.class)
+    public ResponseEntity<ErrorDtoRes> handleInsufficientBalance(
+            InsufficientBalanceException exception,
+            HttpServletRequest request
+    ) {
+
+        int httpStatus = HttpStatus.BAD_REQUEST.value();
+
+        return ResponseEntity.status(httpStatus)
+                .body(new ErrorDtoRes(
+                        httpStatus,
+                        request.getMethod(),
+                        "Saldo insuficiente",
+                        exception.getMessage(),
+                        getCurrentTimestamp(),
+                        null
+                ));
+    }
+
+    @ExceptionHandler(InvalidRefreshTokenException.class)
+    public ResponseEntity<ErrorDtoRes> handleInvalidRefreshToken(
+            InvalidRefreshTokenException exception,
+            HttpServletRequest request
+    ) {
+
+        int httpStatus = HttpStatus.UNAUTHORIZED.value();
+
+        return ResponseEntity.status(httpStatus)
+                .body(new ErrorDtoRes(
+                        httpStatus,
+                        request.getMethod(),
+                        "Token inválido",
+                        exception.getMessage(),
+                        getCurrentTimestamp(),
+                        null
+                ));
+    }
+
+    @ExceptionHandler(ExpiredRefreshTokenException.class)
+    public ResponseEntity<ErrorDtoRes> handleExpiredToken(
+            ExpiredRefreshTokenException exception,
+            HttpServletRequest request
+    ) {
+
+        int httpStatus = HttpStatus.UNAUTHORIZED.value();
+
+        return ResponseEntity.status(httpStatus)
+                .body(new ErrorDtoRes(
+                        httpStatus,
+                        request.getMethod(),
+                        "Token expirado",
+                        exception.getMessage(),
+                        getCurrentTimestamp(),
+                        null
+                ));
+    }
+
+    @ExceptionHandler(AccountBlockedException.class)
+    public ResponseEntity<ErrorDtoRes> handleAccountBlocked(
+            AccountBlockedException exception,
+            HttpServletRequest request
+    ) {
+
+        int httpStatus = HttpStatus.FORBIDDEN.value();
+
+        return ResponseEntity.status(httpStatus)
+                .body(new ErrorDtoRes(
+                        httpStatus,
+                        request.getMethod(),
+                        "Cuenta bloqueada",
+                        exception.getMessage(),
+                        getCurrentTimestamp(),
+                        null
+                ));
+    }
+
+    @ExceptionHandler(DailyLimitExceededException.class)
+    public ResponseEntity<ErrorDtoRes> handleDailyLimit(
+            DailyLimitExceededException exception,
+            HttpServletRequest request
+    ) {
+
+        int httpStatus = HttpStatus.BAD_REQUEST.value();
+
+        return ResponseEntity.status(httpStatus)
+                .body(new ErrorDtoRes(
+                        httpStatus,
+                        request.getMethod(),
+                        "Límite diario excedido",
+                        exception.getMessage(),
+                        getCurrentTimestamp(),
+                        null
+                ));
+    }
 }

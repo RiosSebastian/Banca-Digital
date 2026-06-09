@@ -1,8 +1,7 @@
 package com.example.SpringSegurity.security;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.config.Customizer;
-import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -24,37 +23,70 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    //private final CustomUserDetailsService userDetailsService;
-
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
         return http
+
+                // Desactivar CSRF para API REST stateless
                 .csrf(AbstractHttpConfigurer::disable)
-                // 1. Activamos CORS para que use tu Bean CorsFilter
-                .cors(Customizer.withDefaults())
-                .sessionManagement(sessionManagement ->
-                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(authorizeRequests ->
-                        authorizeRequests
-                                // 2. Ajusta las rutas (¿tienen /api o no?)
-                                .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
-                                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
-                                // 3. Rutas protegidas
-                                .requestMatchers("/api/v1/rooms/**").authenticated()
-                                .anyRequest().authenticated())
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+
+                // Configuración CORS
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
+                // Stateless porque usamos JWT
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+
+                // Configuración de rutas
+                .authorizeHttpRequests(auth -> auth
+
+                        // AUTH PÚBLICO
+                        .requestMatchers(
+                                "/api/auth/login",
+                                "/api/auth/register",
+                                "/api/auth/refresh"
+                        ).permitAll()
+
+                        // SWAGGER
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
+
+                        // ENDPOINTS ADMIN
+                        .requestMatchers(HttpMethod.DELETE, "/users/**")
+                        .hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.GET, "/users")
+                        .hasRole("ADMIN")
+
+                        // TODO LO DEMÁS REQUIERE AUTH
+                        .anyRequest().authenticated()
+                )
+
+                // JWT FILTER
+                .addFilterBefore(
+                        jwtAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class
+                )
+
                 .build();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
-        return authConfig.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration configuration
+    ) throws Exception {
+        return configuration.getAuthenticationManager();
     }
 
     @Bean
@@ -63,14 +95,31 @@ public class SecurityConfig {
     }
 
     @Bean
-    public CorsFilter corsFilter() {
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        CorsConfiguration corsConfig = new CorsConfiguration();
-        corsConfig.setAllowedOrigins(List.of("http://localhost:3000", "http://127.0.0.1:3000")); // Origen permitido
-        corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")); // Métodos permitidos
-        corsConfig.setAllowedHeaders(List.of("Authorization", "Content-Type", "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")); // Cabeceras permitidas
-        corsConfig.setAllowCredentials(true); // Permitir credenciales (si es necesario)
-        source.registerCorsConfiguration("/**", corsConfig);
-        return new CorsFilter(source);
+    public CorsConfigurationSource corsConfigurationSource() {
+
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        configuration.setAllowedOrigins(List.of(
+                "http://localhost:3000"
+        ));
+
+        configuration.setAllowedMethods(List.of(
+                "GET",
+                "POST",
+                "PUT",
+                "DELETE",
+                "OPTIONS"
+        ));
+
+        configuration.setAllowedHeaders(List.of("*"));
+
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
+
+        source.registerCorsConfiguration("/**", configuration);
+
+        return source;
     }
 }

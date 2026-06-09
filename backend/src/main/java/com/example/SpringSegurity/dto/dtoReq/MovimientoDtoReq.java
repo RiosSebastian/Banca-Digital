@@ -3,14 +3,13 @@ package com.example.SpringSegurity.dto.dtoReq;
 import com.example.SpringSegurity.util.TipoTransaccion;
 import com.example.SpringSegurity.validation.annotation.ValidAmount;
 
-import java.time.LocalDateTime;
+public record MovimientoDtoReq(
 
-public record TransaccionDtoReq(
-        Long cuentaOrigenId,
-
-        Long cuentaDestinoId,
+        Long cuentaId,
 
         @ValidAmount
-        Double monto
+        Double monto,
+
+        TipoTransaccion tipo
 ) {
 }

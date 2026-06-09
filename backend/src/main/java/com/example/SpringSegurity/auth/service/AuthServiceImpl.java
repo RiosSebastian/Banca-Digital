@@ -7,16 +7,23 @@ import com.example.SpringSegurity.auth.dto.response.LoginResponse;
 import com.example.SpringSegurity.auth.entity.RefreshTokenEntity;
 import com.example.SpringSegurity.dto.UserDTORes;
 import com.example.SpringSegurity.entity.UserEntity;
+import com.example.SpringSegurity.exceptions.AccountBlockedException;
 import com.example.SpringSegurity.mapper.UserMapper;
 import com.example.SpringSegurity.repository.UserRepository;
 
 import com.example.SpringSegurity.security.JwtUtil;
+import com.example.SpringSegurity.util.Estado;
 import com.example.SpringSegurity.util.UserEnum;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -32,16 +39,46 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public LoginResponse login(LoginRequest request) {
 
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.email(),
-                        request.password()
-                )
-        );
+        try {
+
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            request.email(),
+                            request.password()
+                    )
+            );
+            user.setFailedLoginAttempts(0);
+        }catch (BadCredentialsException e) {
+
+            int attempts = user.getFailedLoginAttempts() + 1;
+
+            user.setFailedLoginAttempts(attempts);
+
+            if (attempts >= 5) {
+
+                user.setEstado(Estado.BLOQUEADA);
+
+                user.setBlockedUntil(
+                        LocalDateTime.now().plusMinutes(30)
+                );
+            }
+
+            userRepository.save(user);
+
+            throw e;
+        }
 
         UserEntity user = userRepository
                 .findByEmail(request.email())
-                .orElseThrow();
+                .orElseThrow(() ->
+                        new UsernameNotFoundException("Usuario no encontrado")
+                );
+
+        if (user.getEstado() == Estado.BLOQUEADA) {
+            throw new AccountBlockedException(
+                    "La cuenta se encuentra bloqueada"
+            );
+        };
 
         String accessToken =
                 jwtUtil.generateToken(user.getEmail());
@@ -64,6 +101,8 @@ public class AuthServiceImpl implements AuthService {
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
                 .userEnum(UserEnum.USER)
+                .estado(Estado.ACTIVA)
+                .failedLoginAttempts(0)
                 .build();
 
         userRepository.save(user);

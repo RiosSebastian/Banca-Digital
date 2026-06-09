@@ -59,7 +59,9 @@ public class UserServiceImp implements UserService {
         UserEntity existeUser = userRepository.findById(id)
                 .orElseThrow(()-> new ChangeSetPersister.NotFoundException());
         existeUser.setNombre(userDTOReq.name());
-        existeUser.setPassword(userDTOReq.password());
+        existeUser.setPassword(
+                passwordEncoder.encode(userDTOReq.password())
+        );
         existeUser.setEmail(userDTOReq.email());
         existeUser.setUserEnum(UserEnum.valueOf(userDTOReq.userEnum()));
 
