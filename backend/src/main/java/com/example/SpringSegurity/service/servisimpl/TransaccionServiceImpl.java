@@ -9,6 +9,7 @@ import com.example.SpringSegurity.exceptions.AccountBlockedException;
 import com.example.SpringSegurity.exceptions.DailyLimitExceededException;
 import com.example.SpringSegurity.exceptions.InsufficientBalanceException;
 import com.example.SpringSegurity.exceptions.NotFoundException;
+import com.example.SpringSegurity.mapper.TransaccionMapper;
 import com.example.SpringSegurity.repository.AccountRepository;
 import com.example.SpringSegurity.repository.TransaccionRepository;
 import com.example.SpringSegurity.service.TransaccionService;

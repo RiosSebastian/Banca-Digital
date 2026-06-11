@@ -5,15 +5,19 @@ import com.example.SpringSegurity.auth.dto.request.RegisterRequest;
 import com.example.SpringSegurity.auth.dto.response.LoginResponse;
 
 import com.example.SpringSegurity.auth.entity.RefreshTokenEntity;
+import com.example.SpringSegurity.auth.entity.VerificationTokenEntity;
+import com.example.SpringSegurity.auth.repository.VerificationTokenRepository;
 import com.example.SpringSegurity.dto.UserDTORes;
 import com.example.SpringSegurity.entity.UserEntity;
 import com.example.SpringSegurity.exceptions.AccountBlockedException;
+import com.example.SpringSegurity.exceptions.UnauthorizedException;
 import com.example.SpringSegurity.mapper.UserMapper;
 import com.example.SpringSegurity.repository.UserRepository;
 
 import com.example.SpringSegurity.security.JwtUtil;
 import com.example.SpringSegurity.util.Estado;
 import com.example.SpringSegurity.util.UserEnum;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -24,6 +28,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -35,9 +40,22 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
     private final RefreshTokenService refreshTokenService;
+    private final VerificationTokenRepository verificationTokenRepository;
+    private final EmailService emailService;
+
 
     @Override
     public LoginResponse login(LoginRequest request) {
+
+        UserEntity user = userRepository
+                .findByEmail(request.email())
+                .orElseThrow(() ->
+                        new UsernameNotFoundException(
+                                "Usuario no encontrado"
+                        )
+                );
+
+        validarEstadoCuenta(user);
 
         try {
 
@@ -47,38 +65,15 @@ public class AuthServiceImpl implements AuthService {
                             request.password()
                     )
             );
-            user.setFailedLoginAttempts(0);
-        }catch (BadCredentialsException e) {
 
-            int attempts = user.getFailedLoginAttempts() + 1;
+            reiniciarIntentosFallidos(user);
 
-            user.setFailedLoginAttempts(attempts);
+        } catch (BadCredentialsException e) {
 
-            if (attempts >= 5) {
-
-                user.setEstado(Estado.BLOQUEADA);
-
-                user.setBlockedUntil(
-                        LocalDateTime.now().plusMinutes(30)
-                );
-            }
-
-            userRepository.save(user);
+            manejarIntentoFallido(user);
 
             throw e;
         }
-
-        UserEntity user = userRepository
-                .findByEmail(request.email())
-                .orElseThrow(() ->
-                        new UsernameNotFoundException("Usuario no encontrado")
-                );
-
-        if (user.getEstado() == Estado.BLOQUEADA) {
-            throw new AccountBlockedException(
-                    "La cuenta se encuentra bloqueada"
-            );
-        };
 
         String accessToken =
                 jwtUtil.generateToken(user.getEmail());
@@ -93,6 +88,66 @@ public class AuthServiceImpl implements AuthService {
         );
     }
 
+    private void validarEstadoCuenta(UserEntity user) {
+
+        if (user.getEstado() == Estado.INACTIVA) {
+
+            throw new UnauthorizedException(
+                    "Debes verificar tu email"
+            );
+        }
+
+        if (user.getEstado() == Estado.BLOQUEADA) {
+
+            if (user.getBlockedUntil() != null &&
+                    user.getBlockedUntil()
+                            .isAfter(LocalDateTime.now())) {
+
+                throw new AccountBlockedException(
+                        "La cuenta se encuentra bloqueada hasta "
+                                + user.getBlockedUntil()
+                );
+            }
+
+            desbloquearCuenta(user);
+        }
+    }
+    private void desbloquearCuenta(UserEntity user) {
+
+        user.setEstado(Estado.ACTIVA);
+
+        user.setFailedLoginAttempts(0);
+
+        user.setBlockedUntil(null);
+
+        userRepository.save(user);
+    }
+    private void reiniciarIntentosFallidos(UserEntity user) {
+
+        user.setFailedLoginAttempts(0);
+
+        userRepository.save(user);
+    }
+    private void manejarIntentoFallido(UserEntity user) {
+
+        int attempts =
+                user.getFailedLoginAttempts() + 1;
+
+        user.setFailedLoginAttempts(attempts);
+
+        if (attempts >= 5) {
+
+            user.setEstado(Estado.BLOQUEADA);
+
+            user.setBlockedUntil(
+                    LocalDateTime.now()
+                            .plusMinutes(30)
+            );
+        }
+
+        userRepository.save(user);
+    }
+
     @Override
     public UserDTORes register(RegisterRequest request) {
 
@@ -101,12 +156,68 @@ public class AuthServiceImpl implements AuthService {
                 .email(request.email())
                 .password(passwordEncoder.encode(request.password()))
                 .userEnum(UserEnum.USER)
-                .estado(Estado.ACTIVA)
+                .estado(Estado.INACTIVA)
                 .failedLoginAttempts(0)
                 .build();
 
         userRepository.save(user);
 
+        String token = UUID.randomUUID().toString();
+
+        VerificationTokenEntity verificationToken =
+                VerificationTokenEntity.builder()
+                        .token(token)
+                        .expirationDate(
+                                LocalDateTime.now()
+                                        .plusHours(24)
+                        )
+                        .user(user)
+                        .build();
+
+        verificationTokenRepository.save(
+                verificationToken);
+
+        emailService.sendVerificationEmail(
+                user.getEmail(),
+                token
+        );
+
         return userMapper.toDTO(user);
     }
+
+    @Override
+    @Transactional
+    public void verifyAccount(String token) {
+
+        VerificationTokenEntity verificationToken =
+                verificationTokenRepository
+                        .findByToken(token)
+                        .orElseThrow(() ->
+                                new RuntimeException(
+                                        "Token inválido"
+                                )
+                        );
+
+        if (verificationToken
+                .getExpirationDate()
+                .isBefore(LocalDateTime.now())) {
+
+            throw new RuntimeException(
+                    "Token expirado"
+            );
+        }
+
+        UserEntity user =
+                verificationToken.getUser();
+
+        user.setEstado(Estado.ACTIVA);
+
+        userRepository.save(user);
+
+        verificationTokenRepository.delete(
+                verificationToken
+        );
+    }
+
+
 }

@@ -75,4 +75,18 @@ public class AuthController {
                 )
         );
     }
+
+    @GetMapping("/verify")
+    public ResponseEntity<String>
+    verifyEmail(
+
+            @RequestParam String token
+    ) {
+
+        authService.verifyAccount(token);
+
+        return ResponseEntity.ok(
+                "Cuenta verificada correctamente"
+        );
+    }
 }

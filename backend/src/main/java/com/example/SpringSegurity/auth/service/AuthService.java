@@ -11,4 +11,6 @@ public interface AuthService {
     LoginResponse login(LoginRequest request);
 
     UserDTORes register(RegisterRequest request);
+
+    void verifyAccount(String token);
 }
