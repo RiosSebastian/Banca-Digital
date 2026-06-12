@@ -202,4 +202,30 @@ public class GlobalExceptionController {
                         null
                 ));
     }
+
+    @ExceptionHandler(
+            InvalidPasswordResetTokenException.class
+    )
+    public ResponseEntity<String>
+    handleInvalidPasswordResetToken(
+            InvalidPasswordResetTokenException ex
+    ) {
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ex.getMessage());
+    }
+
+    @ExceptionHandler(
+            ExpiredPasswordResetTokenException.class
+    )
+    public ResponseEntity<String>
+    handleExpiredPasswordResetToken(
+            ExpiredPasswordResetTokenException ex
+    ) {
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ex.getMessage());
+    }
 }

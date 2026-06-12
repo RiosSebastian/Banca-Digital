@@ -1,8 +1,6 @@
 package com.example.SpringSegurity.auth.controller;
 
-import com.example.SpringSegurity.auth.dto.request.LoginRequest;
-import com.example.SpringSegurity.auth.dto.request.RefreshTokenRequest;
-import com.example.SpringSegurity.auth.dto.request.RegisterRequest;
+import com.example.SpringSegurity.auth.dto.request.*;
 import com.example.SpringSegurity.auth.dto.response.LoginResponse;
 import com.example.SpringSegurity.auth.dto.response.RefreshTokenResponse;
 import com.example.SpringSegurity.auth.entity.RefreshTokenEntity;
@@ -87,6 +85,36 @@ public class AuthController {
 
         return ResponseEntity.ok(
                 "Cuenta verificada correctamente"
+        );
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String>
+    forgotPassword(
+
+            @RequestBody
+            ForgotPasswordRequest request
+    ) {
+
+        authService.forgotPassword(request);
+
+        return ResponseEntity.ok(
+                "Email enviado"
+        );
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String>
+    resetPassword(
+
+            @RequestBody
+            ResetPasswordRequest request
+    ) {
+
+        authService.resetPassword(request);
+
+        return ResponseEntity.ok(
+                "Contraseña actualizada"
         );
     }
 }

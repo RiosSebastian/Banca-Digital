@@ -1,6 +1,5 @@
-package com.example.SpringSegurity.service.servisimpl;
+package com.example.SpringSegurity.auth.mail;
 
-import com.example.SpringSegurity.auth.service.EmailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -39,6 +38,36 @@ public class EmailServiceImpl
                 
                 %s
                 """.formatted(link));
+
+        mailSender.send(message);
+    }
+
+    @Override
+    public void sendPasswordResetEmail(
+            String to,
+            String token
+    ) {
+
+        String link =
+                "http://localhost:8080/api/auth/reset-password?token="
+                        + token;
+
+        SimpleMailMessage message =
+                new SimpleMailMessage();
+
+        message.setTo(to);
+
+        message.setSubject(
+                "Recuperación de contraseña"
+        );
+
+        message.setText("""
+            Recibimos una solicitud para cambiar tu contraseña.
+
+            Usa el siguiente enlace:
+
+            %s
+            """.formatted(link));
 
         mailSender.send(message);
     }
