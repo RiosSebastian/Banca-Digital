@@ -29,9 +29,7 @@ public class AuthController {
 
     @Operation(summary = "Iniciar sesión")
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(
-            @Valid @RequestBody LoginRequest request
-    ) {
+    public ResponseEntity<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
 
         return ResponseEntity.ok(
                 ResponseBuilder.success(
@@ -41,17 +39,13 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserDTORes> register(
-            @Valid @RequestBody RegisterRequest request
-    ) {
+    public ResponseEntity<UserDTORes> register(@Valid @RequestBody RegisterRequest request) {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(authService.register(request));
     }
     @PostMapping("/refresh")
-    public ResponseEntity<RefreshTokenResponse> refreshToken(
-            @RequestBody RefreshTokenRequest request
-    ) {
+    public ResponseEntity<RefreshTokenResponse> refreshToken(@RequestBody RefreshTokenRequest request) {
 
         RefreshTokenEntity refreshToken =
                 refreshTokenService.findByToken(
@@ -75,11 +69,7 @@ public class AuthController {
     }
 
     @GetMapping("/verify")
-    public ResponseEntity<String>
-    verifyEmail(
-
-            @RequestParam String token
-    ) {
+    public ResponseEntity<String> verifyEmail(@RequestParam String token) {
 
         authService.verifyAccount(token);
 
@@ -89,12 +79,7 @@ public class AuthController {
     }
 
     @PostMapping("/forgot-password")
-    public ResponseEntity<String>
-    forgotPassword(
-
-            @RequestBody
-            ForgotPasswordRequest request
-    ) {
+    public ResponseEntity<String> forgotPassword(@RequestBody ForgotPasswordRequest request) {
 
         authService.forgotPassword(request);
 
@@ -104,12 +89,7 @@ public class AuthController {
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<String>
-    resetPassword(
-
-            @RequestBody
-            ResetPasswordRequest request
-    ) {
+    public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
 
         authService.resetPassword(request);
 

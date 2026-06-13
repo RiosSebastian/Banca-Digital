@@ -11,13 +11,11 @@ import com.example.SpringSegurity.auth.entity.RefreshTokenEntity;
 import com.example.SpringSegurity.auth.entity.VerificationTokenEntity;
 import com.example.SpringSegurity.auth.mail.EmailService;
 import com.example.SpringSegurity.auth.repository.PasswordResetTokenRepository;
+import com.example.SpringSegurity.auth.repository.RefreshTokenRepository;
 import com.example.SpringSegurity.auth.repository.VerificationTokenRepository;
 import com.example.SpringSegurity.dto.UserDTORes;
 import com.example.SpringSegurity.entity.UserEntity;
-import com.example.SpringSegurity.exceptions.AccountBlockedException;
-import com.example.SpringSegurity.exceptions.ExpiredPasswordResetTokenException;
-import com.example.SpringSegurity.exceptions.InvalidPasswordResetTokenException;
-import com.example.SpringSegurity.exceptions.UnauthorizedException;
+import com.example.SpringSegurity.exceptions.*;
 import com.example.SpringSegurity.mapper.UserMapper;
 import com.example.SpringSegurity.repository.UserRepository;
 
@@ -49,6 +47,7 @@ public class AuthServiceImpl implements AuthService {
     private final VerificationTokenRepository verificationTokenRepository;
     private final EmailService emailService;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
 
     @Override
@@ -254,26 +253,48 @@ public class AuthServiceImpl implements AuthService {
 
         PasswordResetTokenEntity resetToken =
                 passwordResetTokenRepository
-                        .findByToken(request.token())
+                        .findByToken(
+                                request.token()
+                        )
                         .orElseThrow(() ->
                                 new InvalidPasswordResetTokenException(
                                         "Token inválido"
                                 )
                         );
+
         if (resetToken.getExpirationDate()
                 .isBefore(LocalDateTime.now())) {
 
             throw new ExpiredPasswordResetTokenException(
-                    "El token de recuperación ha expirado"
+                    "Token expirado"
             );
         }
 
-        UserEntity user = resetToken.getUser();
+        UserEntity user =
+                resetToken.getUser();
 
-        user.setPassword(passwordEncoder.encode(request.newPassword()));
+        if (passwordEncoder.matches(
+                request.newPassword(),
+                user.getPassword()
+        )) {
+
+            throw new SamePasswordException(
+                    "La nueva contraseña debe ser diferente a la actual"
+            );
+        }
+
+        refreshTokenRepository
+                .deleteByUser(user);
+
+        user.setPassword(
+                passwordEncoder.encode(
+                        request.newPassword()
+                )
+        );
 
         userRepository.save(user);
 
-        passwordResetTokenRepository.delete(resetToken);
+        passwordResetTokenRepository
+                .delete(resetToken);
     }
 }

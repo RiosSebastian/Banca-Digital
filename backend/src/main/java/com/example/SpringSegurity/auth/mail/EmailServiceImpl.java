@@ -13,10 +13,7 @@ public class EmailServiceImpl
     private final JavaMailSender mailSender;
 
     @Override
-    public void sendVerificationEmail(
-            String to,
-            String token
-    ) {
+    public void sendVerificationEmail(String to, String token) {
 
         String link =
                 "http://localhost:8080/api/auth/verify?token="
@@ -43,10 +40,7 @@ public class EmailServiceImpl
     }
 
     @Override
-    public void sendPasswordResetEmail(
-            String to,
-            String token
-    ) {
+    public void sendPasswordResetEmail(String to, String token) {
 
         String link =
                 "http://localhost:8080/api/auth/reset-password?token="

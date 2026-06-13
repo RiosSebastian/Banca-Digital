@@ -27,8 +27,7 @@ public class GlobalExceptionController {
     }
 
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<ErrorDtoRes> handleNotFoundException(NotFoundException exception,
-                                                               HttpServletRequest request) {
+    public ResponseEntity<ErrorDtoRes> handleNotFoundException(NotFoundException exception, HttpServletRequest request) {
         int httpStatus = HttpStatus.NOT_FOUND.value();
         return ResponseEntity.status(httpStatus).body(new ErrorDtoRes(
                 httpStatus,
@@ -42,8 +41,7 @@ public class GlobalExceptionController {
 
     // AHORA SÍ: Agregamos la anotación que faltaba
     @ExceptionHandler(DuplicatedException.class)
-    public ResponseEntity<ErrorDtoRes> handleDuplicatedException(DuplicatedException exception,
-                                                                 HttpServletRequest request) {
+    public ResponseEntity<ErrorDtoRes> handleDuplicatedException(DuplicatedException exception, HttpServletRequest request) {
         int httpStatus = HttpStatus.CONFLICT.value();
         return ResponseEntity.status(httpStatus).body(new ErrorDtoRes(
                 httpStatus,
@@ -56,8 +54,7 @@ public class GlobalExceptionController {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorDtoRes> handleMethodArgumentNotValidException(
-            MethodArgumentNotValidException exception, HttpServletRequest request) {
+    public ResponseEntity<ErrorDtoRes> handleMethodArgumentNotValidException(MethodArgumentNotValidException exception, HttpServletRequest request) {
 
         int httpStatus = HttpStatus.BAD_REQUEST.value();
         List<String> details = exception.getBindingResult()
@@ -81,8 +78,7 @@ public class GlobalExceptionController {
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<ErrorDtoRes> handleBadCredentialsException(
-            BadCredentialsException exception, HttpServletRequest request) {
+    public ResponseEntity<ErrorDtoRes> handleBadCredentialsException(BadCredentialsException exception, HttpServletRequest request) {
         int httpStatus = HttpStatus.UNAUTHORIZED.value();
         return ResponseEntity.status(httpStatus).body(new ErrorDtoRes(
                 httpStatus,
@@ -95,8 +91,7 @@ public class GlobalExceptionController {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorDtoRes> handleAllExceptions(Exception exception,
-                                                           HttpServletRequest request) {
+    public ResponseEntity<ErrorDtoRes> handleAllExceptions(Exception exception, HttpServletRequest request) {
         int httpStatus = HttpStatus.INTERNAL_SERVER_ERROR.value();
         return ResponseEntity.status(httpStatus).body(new ErrorDtoRes(
                 httpStatus,
@@ -109,10 +104,7 @@ public class GlobalExceptionController {
     }
 
     @ExceptionHandler(InsufficientBalanceException.class)
-    public ResponseEntity<ErrorDtoRes> handleInsufficientBalance(
-            InsufficientBalanceException exception,
-            HttpServletRequest request
-    ) {
+    public ResponseEntity<ErrorDtoRes> handleInsufficientBalance(InsufficientBalanceException exception, HttpServletRequest request) {
 
         int httpStatus = HttpStatus.BAD_REQUEST.value();
 
@@ -128,10 +120,7 @@ public class GlobalExceptionController {
     }
 
     @ExceptionHandler(InvalidRefreshTokenException.class)
-    public ResponseEntity<ErrorDtoRes> handleInvalidRefreshToken(
-            InvalidRefreshTokenException exception,
-            HttpServletRequest request
-    ) {
+    public ResponseEntity<ErrorDtoRes> handleInvalidRefreshToken(InvalidRefreshTokenException exception, HttpServletRequest request) {
 
         int httpStatus = HttpStatus.UNAUTHORIZED.value();
 
@@ -147,10 +136,7 @@ public class GlobalExceptionController {
     }
 
     @ExceptionHandler(ExpiredRefreshTokenException.class)
-    public ResponseEntity<ErrorDtoRes> handleExpiredToken(
-            ExpiredRefreshTokenException exception,
-            HttpServletRequest request
-    ) {
+    public ResponseEntity<ErrorDtoRes> handleExpiredToken(ExpiredRefreshTokenException exception, HttpServletRequest request) {
 
         int httpStatus = HttpStatus.UNAUTHORIZED.value();
 
@@ -166,10 +152,7 @@ public class GlobalExceptionController {
     }
 
     @ExceptionHandler(AccountBlockedException.class)
-    public ResponseEntity<ErrorDtoRes> handleAccountBlocked(
-            AccountBlockedException exception,
-            HttpServletRequest request
-    ) {
+    public ResponseEntity<ErrorDtoRes> handleAccountBlocked(AccountBlockedException exception, HttpServletRequest request) {
 
         int httpStatus = HttpStatus.FORBIDDEN.value();
 
@@ -185,10 +168,7 @@ public class GlobalExceptionController {
     }
 
     @ExceptionHandler(DailyLimitExceededException.class)
-    public ResponseEntity<ErrorDtoRes> handleDailyLimit(
-            DailyLimitExceededException exception,
-            HttpServletRequest request
-    ) {
+    public ResponseEntity<ErrorDtoRes> handleDailyLimit(DailyLimitExceededException exception, HttpServletRequest request) {
 
         int httpStatus = HttpStatus.BAD_REQUEST.value();
 
@@ -203,26 +183,16 @@ public class GlobalExceptionController {
                 ));
     }
 
-    @ExceptionHandler(
-            InvalidPasswordResetTokenException.class
-    )
-    public ResponseEntity<String>
-    handleInvalidPasswordResetToken(
-            InvalidPasswordResetTokenException ex
-    ) {
+    @ExceptionHandler(InvalidPasswordResetTokenException.class)
+    public ResponseEntity<String> handleInvalidPasswordResetToken(InvalidPasswordResetTokenException ex) {
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ex.getMessage());
     }
 
-    @ExceptionHandler(
-            ExpiredPasswordResetTokenException.class
-    )
-    public ResponseEntity<String>
-    handleExpiredPasswordResetToken(
-            ExpiredPasswordResetTokenException ex
-    ) {
+    @ExceptionHandler(ExpiredPasswordResetTokenException.class)
+    public ResponseEntity<String> handleExpiredPasswordResetToken(ExpiredPasswordResetTokenException ex) {
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
