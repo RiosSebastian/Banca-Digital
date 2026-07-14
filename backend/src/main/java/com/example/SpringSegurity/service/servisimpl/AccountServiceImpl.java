@@ -64,5 +64,15 @@ public class AccountServiceImpl implements AccountService {
                 .map(accountMapper::toDto)
                 .toList();
     }
+
+    @Override
+    public Double getTotalBalance(Long userId) {
+
+        return accountRepository.findByUserId(userId)
+                .stream()
+                .mapToDouble(AccountEntity::getBalance)
+                .sum();
+
+    }
 }
 

@@ -23,12 +23,7 @@ public class TransaccionController {
     // =========================================
 
     @PostMapping("/movimiento")
-    public ResponseEntity<TransaccionDtoRes>
-    movimiento(
-
-            @Valid
-            @RequestBody MovimientoDtoReq dto
-    ) {
+    public ResponseEntity<TransaccionDtoRes> movimiento(@Valid @RequestBody MovimientoDtoReq dto) {
 
         return ResponseEntity.ok(
                 transaccionService
@@ -41,13 +36,7 @@ public class TransaccionController {
     // =========================================
 
     @PostMapping("/transferencia")
-    public ResponseEntity<TransaccionDtoRes>
-    transferencia(
-
-            @Valid
-            @RequestBody
-            TransaccionDtoReq dto
-    ) {
+    public ResponseEntity<TransaccionDtoRes> transferencia(@Valid @RequestBody TransaccionDtoReq dto) {
 
         return ResponseEntity.ok(
                 transaccionService
@@ -60,11 +49,7 @@ public class TransaccionController {
     // =========================================
 
     @GetMapping("/{cuentaId}")
-    public ResponseEntity<List<TransaccionDtoRes>>
-    historial(
-
-            @PathVariable Long cuentaId
-    ) {
+    public ResponseEntity<List<TransaccionDtoRes>> historial(@PathVariable Long cuentaId) {
 
         return ResponseEntity.ok(
                 transaccionService

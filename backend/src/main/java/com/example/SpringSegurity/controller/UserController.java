@@ -30,9 +30,7 @@ public class UserController {
 
     // Buscar usuario por ID
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<UserDTORes>> getUser(
-            @PathVariable Long id
-    ) {
+    public ResponseEntity<ApiResponse<UserDTORes>> getUser(@PathVariable Long id) {
 
         return ResponseEntity.ok(
                 ResponseBuilder.success(
@@ -42,7 +40,7 @@ public class UserController {
         );
     }
 
-    //crear usuario
+
     // Crear un nuevo usuario
     @PostMapping
     public ResponseEntity<UserDTORes> createUser(@Valid @RequestBody UserDTOReq userDTOReq) {

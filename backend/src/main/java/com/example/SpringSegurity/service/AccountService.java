@@ -14,4 +14,6 @@ public interface AccountService {
     void deleteAccount(Long id);//Eliminar cuenta
 
     List<AccountDtoRes>getAll();//listar cuentas
+
+    Double getTotalBalance(Long userId);
 }

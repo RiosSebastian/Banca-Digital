@@ -1,5 +1,7 @@
 package com.example.SpringSegurity.service.servisimpl;
 
+import com.example.SpringSegurity.dto.BalanceHistoryDto;
+import com.example.SpringSegurity.dto.RecentTransactionDto;
 import com.example.SpringSegurity.dto.TransaccionDtoRes;
 import com.example.SpringSegurity.dto.dtoReq.MovimientoDtoReq;
 import com.example.SpringSegurity.dto.dtoReq.TransaccionDtoReq;
@@ -38,12 +40,9 @@ public class TransaccionServiceImpl implements TransaccionService {
     // =====================================================
 
     @Override
-    public TransaccionDtoRes createMovimiento(
-            MovimientoDtoReq dto
-    ) {
+    public TransaccionDtoRes createMovimiento(MovimientoDtoReq dto) {
 
-        AccountEntity cuenta =
-                accountRepository.findById(dto.cuentaId())
+        AccountEntity cuenta = accountRepository.findById(dto.cuentaId())
                         .orElseThrow(() ->
                                 new NotFoundException(
                                         "Cuenta no encontrada"
@@ -72,17 +71,9 @@ public class TransaccionServiceImpl implements TransaccionService {
                     );
         }
 
-        TransaccionEntity tx =
-                crearTransaccion(
-                        dto.monto(),
-                        dto.tipo(),
-                        cuenta
-                );
+        TransaccionEntity tx = crearTransaccion(dto.monto(), dto.tipo(), cuenta);
 
-        return new TransaccionDtoRes(
-                tx.getFecha(),
-                tx.getTipo()
-        );
+        return new TransaccionDtoRes(tx.getFecha(), tx.getTipo());
     }
 
 
@@ -92,24 +83,16 @@ public class TransaccionServiceImpl implements TransaccionService {
     // =====================================================
 
     @Override
-    public TransaccionDtoRes realizarTransferencia(
-            TransaccionDtoReq dto
-    ) {
+    public TransaccionDtoRes realizarTransferencia(TransaccionDtoReq dto) {
 
-        AccountEntity cuentaOrigen =
-                accountRepository.findById(
-                                dto.cuentaOrigenId()
-                        )
+        AccountEntity cuentaOrigen = accountRepository.findById(dto.cuentaOrigenId())
                         .orElseThrow(() ->
                                 new NotFoundException(
                                         "Cuenta origen no encontrada"
                                 )
                         );
 
-        AccountEntity cuentaDestino =
-                accountRepository.findById(
-                                dto.cuentaDestinoId()
-                        )
+        AccountEntity cuentaDestino = accountRepository.findById(dto.cuentaDestinoId())
                         .orElseThrow(() ->
                                 new NotFoundException(
                                         "Cuenta destino no encontrada"
@@ -118,45 +101,29 @@ public class TransaccionServiceImpl implements TransaccionService {
 
         validarCuentaBloqueada(cuentaOrigen);
 
-        validarTransferenciaPropia(
-                cuentaOrigen,
-                cuentaDestino
-        );
+        validarTransferenciaPropia(cuentaOrigen, cuentaDestino);
 
-        validarSaldo(
-                cuentaOrigen,
-                dto.monto()
-        );
+        validarSaldo(cuentaOrigen, dto.monto());
 
-        validarLimiteDiario(
-                cuentaOrigen,
-                dto.monto()
-        );
+        validarLimiteDiario(cuentaOrigen, dto.monto());
 
         // descontar origen
-        cuentaOrigen.setBalance(
-                cuentaOrigen.getBalance()
-                        - dto.monto()
-        );
+        cuentaOrigen.setBalance(cuentaOrigen.getBalance() - dto.monto());
 
         // sumar destino
-        cuentaDestino.setBalance(
-                cuentaDestino.getBalance()
-                        + dto.monto()
-        );
+        cuentaDestino.setBalance(cuentaDestino.getBalance() + dto.monto());
 
         accountRepository.save(cuentaOrigen);
 
         accountRepository.save(cuentaDestino);
 
-        TransaccionEntity tx =
-                new TransaccionEntity();
+        TransaccionEntity tx = new TransaccionEntity();
 
         tx.setMonto(dto.monto());
 
         tx.setFecha(LocalDateTime.now());
 
-        tx.setTipo(TipoTransaccion.TRANSFERENCIA);
+        tx.setTipo(TipoTransaccion.TRANSFERENCIA_ENVIADA);
 
         tx.setCuentaOrigen(cuentaOrigen);
 
@@ -166,10 +133,7 @@ public class TransaccionServiceImpl implements TransaccionService {
 
         transaccionRepository.save(tx);
 
-        return new TransaccionDtoRes(
-                tx.getFecha(),
-                tx.getTipo()
-        );
+        return new TransaccionDtoRes(tx.getFecha(), tx.getTipo());
     }
 
     // =====================================================
@@ -177,8 +141,7 @@ public class TransaccionServiceImpl implements TransaccionService {
     // =====================================================
 
     @Override
-    public List<TransaccionDtoRes>
-    historialCuenta(Long cuentaId) {
+    public List<TransaccionDtoRes> historialCuenta(Long cuentaId) {
 
         return transaccionRepository
                 .findByCuentaOrigenId(cuentaId)
@@ -187,14 +150,31 @@ public class TransaccionServiceImpl implements TransaccionService {
                 .toList();
     }
 
+    @Override
+    public Double getMonthlyIncome(Long userId) {
+        return 0.0;
+    }
+
+    @Override
+    public Double getMonthlyExpenses(Long userId) {
+        return 0.0;
+    }
+
+    @Override
+    public List<RecentTransactionDto> getRecentTransactions(Long userId) {
+        return List.of();
+    }
+
+    @Override
+    public List<BalanceHistoryDto> getBalanceHistory(Long userId) {
+        return List.of();
+    }
+
     // =====================================================
     // MÉTODOS PRIVADOS
     // =====================================================
 
-    private void realizarDeposito(
-            AccountEntity cuenta,
-            Double monto
-    ) {
+    private void realizarDeposito(AccountEntity cuenta, Double monto) {
 
         cuenta.setBalance(
                 cuenta.getBalance() + monto
@@ -203,10 +183,7 @@ public class TransaccionServiceImpl implements TransaccionService {
         accountRepository.save(cuenta);
     }
 
-    private void realizarRetiro(
-            AccountEntity cuenta,
-            Double monto
-    ) {
+    private void realizarRetiro(AccountEntity cuenta, Double monto) {
 
         validarSaldo(cuenta, monto);
 
@@ -217,10 +194,7 @@ public class TransaccionServiceImpl implements TransaccionService {
         accountRepository.save(cuenta);
     }
 
-    private void validarSaldo(
-            AccountEntity cuenta,
-            Double monto
-    ) {
+    private void validarSaldo(AccountEntity cuenta, Double monto) {
 
         if (cuenta.getBalance() < monto) {
 
@@ -230,9 +204,7 @@ public class TransaccionServiceImpl implements TransaccionService {
         }
     }
 
-    private void validarCuentaBloqueada(
-            AccountEntity cuenta
-    ) {
+    private void validarCuentaBloqueada(AccountEntity cuenta) {
 
         if (cuenta.getUser().getEstado()
                 == Estado.BLOQUEADA) {
@@ -243,10 +215,7 @@ public class TransaccionServiceImpl implements TransaccionService {
         }
     }
 
-    private void validarTransferenciaPropia(
-            AccountEntity origen,
-            AccountEntity destino
-    ) {
+    private void validarTransferenciaPropia(AccountEntity origen, AccountEntity destino) {
 
         if (origen.getId()
                 .equals(destino.getId())) {
@@ -257,10 +226,7 @@ public class TransaccionServiceImpl implements TransaccionService {
         }
     }
 
-    private void validarLimiteDiario(
-            AccountEntity cuenta,
-            Double monto
-    ) {
+    private void validarLimiteDiario(AccountEntity cuenta, Double monto) {
 
         Double totalHoy =
                 transaccionRepository
@@ -277,22 +243,20 @@ public class TransaccionServiceImpl implements TransaccionService {
         }
     }
 
-    private TransaccionEntity crearTransaccion(
-            Double monto,
-            TipoTransaccion tipo,
-            AccountEntity cuenta
-    ) {
+    private TransaccionEntity crearTransaccion(Double monto, TipoTransaccion tipo, AccountEntity account, AccountEntity origen, AccountEntity destino){
 
-        TransaccionEntity tx =
-                new TransaccionEntity();
+        TransaccionEntity tx = new TransaccionEntity();
 
         tx.setMonto(monto);
-
         tx.setFecha(LocalDateTime.now());
 
         tx.setTipo(tipo);
 
-        tx.setAccount(cuenta);
+        tx.setAccount(account);
+
+        tx.setCuentaOrigen(origen);
+
+        tx.setCuentaDestino(destino);
 
         return transaccionRepository.save(tx);
     }
