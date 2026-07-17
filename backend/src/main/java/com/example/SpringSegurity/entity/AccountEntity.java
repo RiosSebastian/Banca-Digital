@@ -17,41 +17,35 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-    public class AccountEntity {
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        private Long id;
+public class AccountEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-        private String alias;
-        private String cbu;
-        private Double balance = 0.0;
+    private String alias;
+    private String cbu;
+    private Double balance = 0.0;
 
-        @OneToOne
-        private UserEntity user;
+    @OneToOne
+    private UserEntity user;
 
     @OneToMany(mappedBy = "account")
     private List<TransaccionEntity> transacciones;
 
-    /*@PrePersist
+    @PrePersist
     public void generateAliasAndCBU() {
-        // Verificación de seguridad
         String nombre = (user != null && user.getNombre() != null) ? user.getNombre() : "usuario";
-        String email = (user != null && user.getEmail() != null) ? user.getEmail() : "anonimo";
-
-        this.alias = generateAlias(nombre, email);
+        this.alias = generateAlias(nombre);
         this.cbu = generateCBU();
     }
 
-    private String generateAlias(String name, String email) {
-        String base = name.toLowerCase().replaceAll("\\s+", ".") +
-                "." + UUID.randomUUID().toString().substring(0, 5);
-        return base;
-    }*/
+    private String generateAlias(String name) {
+        return name.toLowerCase().replaceAll("\\s+", ".")
+                + "." + UUID.randomUUID().toString().substring(0, 5);
+    }
 
     private String generateCBU() {
-        return String.format("%022d", Math.abs(new Random().nextLong()) % 1_000_000_000_000_000_000L);
+        return String.format("%022d",
+                Math.abs(new Random().nextLong()) % 1_000_000_000_000_000_000L);
     }
-
-    }
-
-
+}

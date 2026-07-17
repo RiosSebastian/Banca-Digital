@@ -225,26 +225,21 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public void forgotPassword(ForgotPasswordRequest request) {
+        userRepository.findByEmail(request.email())
+                .ifPresent(user -> {
+                    passwordResetTokenRepository.deleteByUser(user);
 
-        UserEntity user =
-                userRepository.findByEmail(request.email()).orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+                    String token = UUID.randomUUID().toString();
+                    PasswordResetTokenEntity resetToken =
+                            PasswordResetTokenEntity.builder()
+                                    .token(token)
+                                    .expirationDate(LocalDateTime.now().plusHours(1))
+                                    .user(user)
+                                    .build();
 
-        passwordResetTokenRepository.deleteByUser(user);
-
-        String token = UUID.randomUUID().toString();
-
-        PasswordResetTokenEntity resetToken = PasswordResetTokenEntity.builder()
-                        .token(token)
-                        .expirationDate(LocalDateTime.now().plusHours(1))
-                        .user(user)
-                        .build();
-
-        passwordResetTokenRepository.save(resetToken);
-
-        emailService.sendPasswordResetEmail(
-                user.getEmail(),
-                token
-        );
+                    passwordResetTokenRepository.save(resetToken);
+                    emailService.sendPasswordResetEmail(user.getEmail(), token);
+                });
     }
 
     @Override

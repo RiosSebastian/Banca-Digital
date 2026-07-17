@@ -30,6 +30,7 @@ public class UserServiceImp implements UserService {
                 .orElseThrow(() -> new NotFoundException("No se encontró el usuario"));
         return userMapper.toDTO(user); // Uso de instancia
     }
+
     @Override
     public List<UserDTORes> getAllUser() {
         return userRepository.findAll()
@@ -55,15 +56,18 @@ public class UserServiceImp implements UserService {
     }
 
     @Override
-    public UserDTORes updateUser(Long id, UserDTOReq userDTOReq) throws ChangeSetPersister.NotFoundException {
+    public UserDTORes updateUser(Long id, UserDTOReq userDTOReq, boolean isAdmin) throws ChangeSetPersister.NotFoundException {
+
         UserEntity existeUser = userRepository.findById(id)
-                .orElseThrow(()-> new ChangeSetPersister.NotFoundException());
+                .orElseThrow(ChangeSetPersister.NotFoundException::new);
+
         existeUser.setNombre(userDTOReq.name());
-        existeUser.setPassword(
-                passwordEncoder.encode(userDTOReq.password())
-        );
+        existeUser.setPassword(passwordEncoder.encode(userDTOReq.password()));
         existeUser.setEmail(userDTOReq.email());
-        existeUser.setUserEnum(UserEnum.valueOf(userDTOReq.userEnum()));
+
+        if (isAdmin) {
+            existeUser.setUserEnum(UserEnum.valueOf(userDTOReq.userEnum()));
+        }
 
         existeUser = userRepository.save(existeUser);
         return userMapper.toDTO(existeUser);
@@ -76,9 +80,6 @@ public class UserServiceImp implements UserService {
 
         userRepository.delete(user);
     }
-
-
-
 
     @Override
     public UserDTORes updateProfileImage(Long id, String imageUrl) {

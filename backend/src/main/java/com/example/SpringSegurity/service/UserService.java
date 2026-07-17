@@ -15,7 +15,7 @@ public interface UserService {
     UserDTORes getUserById(Long id);
 
     // Firma del método para actualizar un usuario
-    UserDTORes updateUser(Long id, UserDTOReq userDTOReq) throws ChangeSetPersister.NotFoundException;
+    UserDTORes updateUser(Long id, UserDTOReq userDTOReq, boolean isAdmin) throws ChangeSetPersister.NotFoundException;
 
     // Firma del método para eliminar un usuario por su ID
     void deleteUser(Long id) throws ChangeSetPersister.NotFoundException;

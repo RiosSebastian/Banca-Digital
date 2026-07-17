@@ -17,26 +17,17 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public DashboardDtoRes getDashboard(Long userId) {
+        Double totalBalance = accountService.getTotalBalance(userId);
+        Double income = transactionService.getMonthlyIncome(userId);
+        Double expenses = transactionService.getMonthlyExpenses(userId);
 
-        Double totalBalance =
-                accountService.getTotalBalance(userId);
-
-        Double income =
-                transactionService.getMonthlyIncome(userId);
-
-        Double expenses =
-                transactionService.getMonthlyExpenses(userId);
-
-        DashboardSummaryDto summary =
-                new DashboardSummaryDto(
-                        totalBalance,
-                        income,
-                        expenses,
-                        totalBalance - expenses
-                );
-
-        return new DashboardDtoRes(summary, transactionService.getBalanceHistory(userId), transactionService.getRecentTransactions(userId));
-
+        return new DashboardDtoRes(
+                totalBalance,
+                income,
+                expenses,
+                totalBalance - expenses,
+                transactionService.getBalanceHistory(userId),
+                transactionService.getRecentTransactions(userId)
+        );
     }
-
 }

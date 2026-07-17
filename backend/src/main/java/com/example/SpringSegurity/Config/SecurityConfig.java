@@ -1,5 +1,6 @@
-package com.example.SpringSegurity.security;
+package com.example.SpringSegurity.Config;
 
+import com.example.SpringSegurity.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.context.annotation.Bean;
@@ -47,28 +48,24 @@ public class SecurityConfig {
 
                 // Configuración de rutas
                 .authorizeHttpRequests(auth -> auth
-
                         // AUTH PÚBLICO
                         .requestMatchers(
                                 "/api/auth/login",
                                 "/api/auth/register",
-                                "/api/auth/refresh"
+                                "/api/auth/refresh",
+                                "/api/auth/verify",
+                                "/api/auth/forgot-password",
+                                "/api/auth/reset-password"
                         ).permitAll()
-
                         // SWAGGER
                         .requestMatchers(
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
                         ).permitAll()
-
                         // ENDPOINTS ADMIN
-                        .requestMatchers(HttpMethod.DELETE, "/users/**")
-                        .hasRole("ADMIN")
-
-                        .requestMatchers(HttpMethod.GET, "/users")
-                        .hasRole("ADMIN")
-
+                        .requestMatchers(HttpMethod.DELETE, "/users/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/users").hasRole("ADMIN")
                         // TODO LO DEMÁS REQUIERE AUTH
                         .anyRequest().authenticated()
                 )
@@ -99,9 +96,7 @@ public class SecurityConfig {
 
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.setAllowedOrigins(List.of(
-                "http://localhost:3000"
-        ));
+        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
 
         configuration.setAllowedMethods(List.of(
                 "GET",

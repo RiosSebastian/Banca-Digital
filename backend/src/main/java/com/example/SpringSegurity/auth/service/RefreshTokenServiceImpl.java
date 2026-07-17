@@ -36,9 +36,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     }
 
     @Override
-    public RefreshTokenEntity verifyExpiration(
-            RefreshTokenEntity token
-    ) {
+    public RefreshTokenEntity verifyExpiration(RefreshTokenEntity token) {
 
         if (token.getExpirationDate().isBefore(LocalDateTime.now())) {
 

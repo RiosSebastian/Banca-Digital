@@ -50,4 +50,13 @@ public interface TransaccionRepository extends JpaRepository<TransaccionEntity, 
     Double sumMonthlyExpenses(Long userId);
 
     List<TransaccionEntity> findByAccountUserIdOrderByFechaAsc(Long userId);
+
+    @Query("""
+    SELECT t FROM TransaccionEntity t
+    WHERE t.account.id = :cuentaId
+       OR t.cuentaOrigen.id = :cuentaId
+       OR t.cuentaDestino.id = :cuentaId
+    ORDER BY t.fecha DESC
+    """)
+    List<TransaccionEntity> findAllByCuentaId(Long cuentaId);
 }

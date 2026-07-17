@@ -7,10 +7,7 @@ import com.example.SpringSegurity.dto.dtoReq.MovimientoDtoReq;
 import com.example.SpringSegurity.dto.dtoReq.TransaccionDtoReq;
 import com.example.SpringSegurity.entity.AccountEntity;
 import com.example.SpringSegurity.entity.TransaccionEntity;
-import com.example.SpringSegurity.exceptions.AccountBlockedException;
-import com.example.SpringSegurity.exceptions.DailyLimitExceededException;
-import com.example.SpringSegurity.exceptions.InsufficientBalanceException;
-import com.example.SpringSegurity.exceptions.NotFoundException;
+import com.example.SpringSegurity.exceptions.*;
 import com.example.SpringSegurity.mapper.TransaccionMapper;
 import com.example.SpringSegurity.repository.AccountRepository;
 import com.example.SpringSegurity.repository.TransaccionRepository;
@@ -22,7 +19,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -40,15 +40,11 @@ public class TransaccionServiceImpl implements TransaccionService {
     // =====================================================
 
     @Override
-    public TransaccionDtoRes createMovimiento(MovimientoDtoReq dto) {
-
+    public TransaccionDtoRes createMovimiento(MovimientoDtoReq dto, Long userId) {
         AccountEntity cuenta = accountRepository.findById(dto.cuentaId())
-                        .orElseThrow(() ->
-                                new NotFoundException(
-                                        "Cuenta no encontrada"
-                                )
-                        );
+                .orElseThrow(() -> new NotFoundException("Cuenta no encontrada"));
 
+        validarPropietario(cuenta, userId);
         validarCuentaBloqueada(cuenta);
 
         switch (dto.tipo()) {
@@ -83,21 +79,11 @@ public class TransaccionServiceImpl implements TransaccionService {
     // =====================================================
 
     @Override
-    public TransaccionDtoRes realizarTransferencia(TransaccionDtoReq dto) {
+    public TransaccionDtoRes realizarTransferencia(TransaccionDtoReq dto, Long userId) {
+            AccountEntity cuentaOrigen = accountRepository.findById(dto.cuentaOrigenId())
+                    .orElseThrow(() -> new NotFoundException("Cuenta origen no encontrada"));
 
-        AccountEntity cuentaOrigen = accountRepository.findById(dto.cuentaOrigenId())
-                        .orElseThrow(() ->
-                                new NotFoundException(
-                                        "Cuenta origen no encontrada"
-                                )
-                        );
-
-        AccountEntity cuentaDestino = accountRepository.findById(dto.cuentaDestinoId())
-                        .orElseThrow(() ->
-                                new NotFoundException(
-                                        "Cuenta destino no encontrada"
-                                )
-                        );
+        validarPropietario(cuentaOrigen, userId);
 
         validarCuentaBloqueada(cuentaOrigen);
 
@@ -141,34 +127,20 @@ public class TransaccionServiceImpl implements TransaccionService {
     // =====================================================
 
     @Override
-    public List<TransaccionDtoRes> historialCuenta(Long cuentaId) {
+    public List<TransaccionDtoRes> historialCuenta(Long cuentaId, Long userId) {
+        AccountEntity cuenta = accountRepository.findById(cuentaId)
+                .orElseThrow(() -> new NotFoundException("Cuenta no encontrada"));
 
-        return transaccionRepository
-                .findByCuentaOrigenId(cuentaId)
+        validarPropietario(cuenta, userId);
+
+        return transaccionRepository.findAllByCuentaId(cuentaId)
                 .stream()
                 .map(TransaccionMapper::toDto)
                 .toList();
     }
 
-    @Override
-    public Double getMonthlyIncome(Long userId) {
-        return 0.0;
-    }
 
-    @Override
-    public Double getMonthlyExpenses(Long userId) {
-        return 0.0;
-    }
 
-    @Override
-    public List<RecentTransactionDto> getRecentTransactions(Long userId) {
-        return List.of();
-    }
-
-    @Override
-    public List<BalanceHistoryDto> getBalanceHistory(Long userId) {
-        return List.of();
-    }
 
     // =====================================================
     // MÉTODOS PRIVADOS
@@ -243,24 +215,20 @@ public class TransaccionServiceImpl implements TransaccionService {
         }
     }
 
-    private TransaccionEntity crearTransaccion(Double monto, TipoTransaccion tipo, AccountEntity account, AccountEntity origen, AccountEntity destino){
-
+    private TransaccionEntity crearTransaccion(Double monto, TipoTransaccion tipo, AccountEntity account) {
         TransaccionEntity tx = new TransaccionEntity();
-
         tx.setMonto(monto);
         tx.setFecha(LocalDateTime.now());
-
         tx.setTipo(tipo);
-
         tx.setAccount(account);
-
-        tx.setCuentaOrigen(origen);
-
-        tx.setCuentaDestino(destino);
-
         return transaccionRepository.save(tx);
     }
 
+    private void validarPropietario(AccountEntity cuenta, Long userId) {
+        if (!cuenta.getUser().getId().equals(userId)) {
+            throw new UnauthorizedException("La cuenta no te pertenece");
+        }
+    }
 
 
     @Override
@@ -292,4 +260,52 @@ public class TransaccionServiceImpl implements TransaccionService {
     public List<TransaccionDtoRes> listTransaccionTipo(TipoTransaccion tipo) {
         return List.of();
     }
+
+    @Override
+    public Double getMonthlyIncome(Long userId) {
+        return transaccionRepository.sumMonthlyIncome(userId);
+    }
+
+    @Override
+    public Double getMonthlyExpenses(Long userId) {
+        return transaccionRepository.sumMonthlyExpenses(userId);
+    }
+
+    @Override
+    public List<RecentTransactionDto> getRecentTransactions(Long userId) {
+        return transaccionRepository.findTop5ByAccountUserIdOrderByFechaDesc(userId)
+                .stream()
+                .map(t -> new RecentTransactionDto(
+                        t.getId(),
+                        t.getTipo().name(),
+                        t.getMonto(),
+                        t.getTipo(),
+                        t.getFecha()
+                ))
+                .toList();
+    }
+
+    @Override
+    public List<BalanceHistoryDto> getBalanceHistory(Long userId) {
+        List<TransaccionEntity> transacciones =
+                transaccionRepository.findByAccountUserIdOrderByFechaAsc(userId);
+
+        Map<String, Double> balancePorMes = new LinkedHashMap<>();
+        double acumulado = 0.0;
+
+        for (TransaccionEntity t : transacciones) {
+            acumulado += switch (t.getTipo()) {
+                case DEPOSITO, TRANSFERENCIA_RECIBIDA -> t.getMonto();
+                case RETIRO, TRANSFERENCIA_ENVIADA -> -t.getMonto();
+            };
+            String mes = t.getFecha().format(DateTimeFormatter.ofPattern("yyyy-MM"));
+            balancePorMes.put(mes, acumulado);
+        }
+
+        return balancePorMes.entrySet().stream()
+                .map(e -> new BalanceHistoryDto(e.getKey(), e.getValue()))
+                .toList();
+    }
+
+
 }

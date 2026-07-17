@@ -13,9 +13,9 @@ import java.util.List;
 
 public interface TransaccionService {
 
-    TransaccionDtoRes createMovimiento(MovimientoDtoReq dto);// crear una transaccion
+    TransaccionDtoRes createMovimiento(MovimientoDtoReq dto, Long userId);// crear una transaccion
 
-    TransaccionDtoRes realizarTransferencia(TransaccionDtoReq dto);
+    TransaccionDtoRes realizarTransferencia(TransaccionDtoReq dto, Long userId);
 
     TransaccionDtoRes updateTransaccion(Double monto , TipoTransaccion tipo, AccountEntity cuentaDestino);//actualizar transaccion
 
@@ -29,9 +29,7 @@ public interface TransaccionService {
 
     List<TransaccionDtoRes>listTransaccionTipo(TipoTransaccion tipo);//listar transacciones por tipo
 
-    List<TransaccionDtoRes>
-
-    historialCuenta(Long cuentaId);
+    List<TransaccionDtoRes> historialCuenta(Long cuentaId, Long userId);
 
     Double getMonthlyIncome(Long userId);
 
