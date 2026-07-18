@@ -80,47 +80,37 @@ public class TransaccionServiceImpl implements TransaccionService {
 
     @Override
     public TransaccionDtoRes realizarTransferencia(TransaccionDtoReq dto, Long userId) {
-            AccountEntity cuentaOrigen = accountRepository.findById(dto.cuentaOrigenId())
-                    .orElseThrow(() -> new NotFoundException("Cuenta origen no encontrada"));
+        AccountEntity cuentaOrigen = accountRepository.findById(dto.cuentaOrigenId())
+                .orElseThrow(() -> new NotFoundException("Cuenta origen no encontrada"));
+
+        AccountEntity cuentaDestino = accountRepository.findByCbu(dto.cbuDestino())
+                .orElseThrow(() -> new NotFoundException("Cuenta destino no encontrada"));
 
         validarPropietario(cuentaOrigen, userId);
-
         validarCuentaBloqueada(cuentaOrigen);
-
         validarTransferenciaPropia(cuentaOrigen, cuentaDestino);
-
         validarSaldo(cuentaOrigen, dto.monto());
-
         validarLimiteDiario(cuentaOrigen, dto.monto());
 
-        // descontar origen
         cuentaOrigen.setBalance(cuentaOrigen.getBalance() - dto.monto());
-
-        // sumar destino
         cuentaDestino.setBalance(cuentaDestino.getBalance() + dto.monto());
 
         accountRepository.save(cuentaOrigen);
-
         accountRepository.save(cuentaDestino);
 
         TransaccionEntity tx = new TransaccionEntity();
-
         tx.setMonto(dto.monto());
-
         tx.setFecha(LocalDateTime.now());
-
         tx.setTipo(TipoTransaccion.TRANSFERENCIA_ENVIADA);
-
         tx.setCuentaOrigen(cuentaOrigen);
-
         tx.setCuentaDestino(cuentaDestino);
-
         tx.setAccount(cuentaOrigen);
 
         transaccionRepository.save(tx);
 
         return new TransaccionDtoRes(tx.getFecha(), tx.getTipo());
     }
+
 
     // =====================================================
     // HISTORIAL

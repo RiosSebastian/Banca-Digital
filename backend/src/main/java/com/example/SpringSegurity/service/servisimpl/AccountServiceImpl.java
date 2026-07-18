@@ -75,6 +75,14 @@ public class AccountServiceImpl implements AccountService {
 
     }
 
+    @Override
+    public List<AccountDtoRes> getByUserId(Long userId) {
+        return accountRepository.findByUserId(userId)
+                .stream()
+                .map(accountMapper::toDto)
+                .toList();
+    }
+
 
 }
 

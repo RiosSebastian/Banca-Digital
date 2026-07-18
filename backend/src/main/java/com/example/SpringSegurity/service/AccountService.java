@@ -16,4 +16,6 @@ public interface AccountService {
     List<AccountDtoRes>getAll();//listar cuentas
 
     Double getTotalBalance(Long userId);
+
+    List<AccountDtoRes> getByUserId(Long userId);
 }
