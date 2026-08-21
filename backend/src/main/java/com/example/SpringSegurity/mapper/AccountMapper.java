@@ -15,6 +15,7 @@ public class AccountMapper {
                 .alias(account.getAlias())
                 .cbu(account.getCbu())
                 .balance(account.getBalance())
+                .tipo(account.getTipo())
                 .userId(account.getUser().getId())
                 .build();
     }

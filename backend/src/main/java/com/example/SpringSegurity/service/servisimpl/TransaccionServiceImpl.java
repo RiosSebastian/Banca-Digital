@@ -16,6 +16,9 @@ import com.example.SpringSegurity.util.Estado;
 import com.example.SpringSegurity.util.TipoTransaccion;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -69,7 +72,7 @@ public class TransaccionServiceImpl implements TransaccionService {
 
         TransaccionEntity tx = crearTransaccion(dto.monto(), dto.tipo(), cuenta);
 
-        return new TransaccionDtoRes(tx.getFecha(), tx.getTipo());
+        return TransaccionMapper.toDto(tx);
     }
 
 
@@ -108,7 +111,7 @@ public class TransaccionServiceImpl implements TransaccionService {
 
         transaccionRepository.save(tx);
 
-        return new TransaccionDtoRes(tx.getFecha(), tx.getTipo());
+        return TransaccionMapper.toDto(tx);
     }
 
 
@@ -131,6 +134,27 @@ public class TransaccionServiceImpl implements TransaccionService {
 
 
 
+
+    // =====================================================
+    // LISTADO PAGINADO (dashboard/transactions del frontend)
+    // =====================================================
+
+    @Override
+    public Page<TransaccionDtoRes> listarPorUsuario(Long userId, int page, int size, String filtro) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "fecha"));
+
+        List<TipoTransaccion> tipos = switch (filtro == null ? "ALL" : filtro.toUpperCase()) {
+            case "INCOME" -> List.of(TipoTransaccion.DEPOSITO, TipoTransaccion.TRANSFERENCIA_RECIBIDA);
+            case "EXPENSE" -> List.of(TipoTransaccion.RETIRO, TipoTransaccion.TRANSFERENCIA_ENVIADA);
+            default -> null;
+        };
+
+        Page<TransaccionEntity> paginaEntidades = tipos == null
+                ? transaccionRepository.findAllByUsuario(userId, pageRequest)
+                : transaccionRepository.findAllByUsuarioAndTipos(userId, tipos, pageRequest);
+
+        return paginaEntidades.map(TransaccionMapper::toDto);
+    }
 
     // =====================================================
     // MÉTODOS PRIVADOS

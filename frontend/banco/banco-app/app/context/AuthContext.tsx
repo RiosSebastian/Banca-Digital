@@ -7,6 +7,8 @@ import {
   useState,
 } from "react";
 
+import axios from "@/app/utils/axios";
+
 interface User {
   id: number;
   name: string;
@@ -15,6 +17,7 @@ interface User {
 
 interface AuthContextType {
   token: string | null;
+  user: User | null;
   login: (jwt: string) => void;
   logout: () => void;
   mounted: boolean;
@@ -32,7 +35,24 @@ export const AuthProvider = ({
 
   const [token, setToken] = useState<string | null>(null);
 
+  const [user, setUser] = useState<User | null>(null);
+
   const [mounted, setMounted] = useState(false);
+
+  const fetchCurrentUser = () => {
+    axios
+      .get("/users/me")
+      .then((res) => {
+        setUser({
+          id: res.data.id,
+          name: res.data.name,
+          email: res.data.email,
+        });
+      })
+      .catch(() => {
+        setUser(null);
+      });
+  };
 
   useEffect(() => {
 
@@ -41,6 +61,7 @@ export const AuthProvider = ({
 
     if (stored) {
       setToken(stored);
+      fetchCurrentUser();
     }
 
     setMounted(true);
@@ -52,6 +73,8 @@ export const AuthProvider = ({
     localStorage.setItem("token", jwt);
 
     setToken(jwt);
+
+    fetchCurrentUser();
   };
 
   const logout = () => {
@@ -59,12 +82,15 @@ export const AuthProvider = ({
     localStorage.removeItem("token");
 
     setToken(null);
+
+    setUser(null);
   };
 
   return (
     <AuthContext.Provider
       value={{
         token,
+        user,
         login,
         logout,
         mounted,

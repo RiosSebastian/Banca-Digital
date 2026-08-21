@@ -9,16 +9,16 @@ import {
   YAxis,
 } from "recharts";
 
-const data = [
-  { month: "Jan", balance: 4000 },
-  { month: "Feb", balance: 7000 },
-  { month: "Mar", balance: 5000 },
-  { month: "Apr", balance: 9000 },
-  { month: "May", balance: 12000 },
-  { month: "Jun", balance: 15000 },
-];
+export interface BalancePoint {
+  month: string;
+  balance: number;
+}
 
-export default function FinancialChart() {
+interface Props {
+  data: BalancePoint[];
+}
+
+export default function FinancialChart({ data }: Props) {
   return (
     <div className="bg-[#111827] border border-[#1E293B] rounded-3xl p-6">
 
@@ -34,29 +34,38 @@ export default function FinancialChart() {
 
       <div className="h-80">
 
-        <ResponsiveContainer
-          width="100%"
-          height="100%"
-        >
+        {data.length === 0 ? (
 
-          <LineChart data={data}>
+          <div className="h-full flex items-center justify-center text-slate-400 text-sm">
+            No hay movimientos todavía
+          </div>
 
-            <XAxis dataKey="month" />
+        ) : (
 
-            <YAxis />
+          <ResponsiveContainer
+            width="100%"
+            height="100%"
+          >
 
-            <Tooltip />
+            <LineChart data={data}>
 
-            <Line
-              type="monotone"
-              dataKey="balance"
-              stroke="#14B8A6"
-              strokeWidth={3}
-            />
+              <XAxis dataKey="month" />
 
-          </LineChart>
+              <YAxis />
 
-        </ResponsiveContainer>
+              <Tooltip />
+
+              <Line
+                type="monotone"
+                dataKey="balance"
+                stroke="#14B8A6"
+                strokeWidth={3}
+              />
+
+            </LineChart>
+
+          </ResponsiveContainer>
+        )}
       </div>
     </div>
   );

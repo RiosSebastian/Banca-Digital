@@ -7,6 +7,7 @@ import com.example.SpringSegurity.dto.dtoReq.MovimientoDtoReq;
 import com.example.SpringSegurity.dto.dtoReq.TransaccionDtoReq;
 import com.example.SpringSegurity.entity.AccountEntity;
 import com.example.SpringSegurity.util.TipoTransaccion;
+import org.springframework.data.domain.Page;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,6 +15,8 @@ import java.util.List;
 public interface TransaccionService {
 
     TransaccionDtoRes createMovimiento(MovimientoDtoReq dto, Long userId);// crear una transaccion
+
+    Page<TransaccionDtoRes> listarPorUsuario(Long userId, int page, int size, String filtro);// listar paginado (filtro: ALL, INCOME, EXPENSE)
 
     TransaccionDtoRes realizarTransferencia(TransaccionDtoReq dto, Long userId);
 

@@ -4,22 +4,23 @@ import { useEffect, useState } from "react";
 
 import axios from "@/app/utils/axios";
 
-import TransactionTable from "@/app/components/TransactionTable";
+import TransactionTable, { TipoTransaccion } from "@/app/components/TransactionTable";
 
 import { Search } from "lucide-react";
 
 interface Transaction {
   id: number;
-  type: "INCOME" | "EXPENSE";
-  amount: number;
-  description: string;
-  createdAt: string;
-  status: string;
+  monto: number;
+  fecha: string;
+  tipo: TipoTransaccion;
+  descripcion: string;
 }
 
 export default function TransactionsPage() {
 
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+
+  const [totalPages, setTotalPages] = useState(1);
 
   const [search, setSearch] = useState("");
 
@@ -30,7 +31,7 @@ export default function TransactionsPage() {
   useEffect(() => {
 
     axios
-      .get("/transactions", {
+      .get("/transacciones", {
         params: {
           page,
           search,
@@ -42,6 +43,7 @@ export default function TransactionsPage() {
       })
       .then((res) => {
         setTransactions(res.data.content);
+        setTotalPages(res.data.totalPages ?? 1);
       });
 
   }, [page, search, filter]);
@@ -146,7 +148,9 @@ export default function TransactionsPage() {
 
         <button
           onClick={() =>
-            setPage((prev) => prev + 1)
+            setPage((prev) =>
+              Math.min(prev + 1, totalPages - 1)
+            )
           }
           className="bg-[#111827] px-5 py-3 rounded-xl"
         >

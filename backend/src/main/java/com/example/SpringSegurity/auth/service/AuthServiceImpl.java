@@ -14,10 +14,12 @@ import com.example.SpringSegurity.auth.repository.PasswordResetTokenRepository;
 import com.example.SpringSegurity.auth.repository.RefreshTokenRepository;
 import com.example.SpringSegurity.auth.repository.VerificationTokenRepository;
 import com.example.SpringSegurity.dto.UserDTORes;
+import com.example.SpringSegurity.dto.dtoReq.AccountDtoReq;
 import com.example.SpringSegurity.entity.UserEntity;
 import com.example.SpringSegurity.exceptions.*;
 import com.example.SpringSegurity.mapper.UserMapper;
 import com.example.SpringSegurity.repository.UserRepository;
+import com.example.SpringSegurity.service.AccountService;
 
 import com.example.SpringSegurity.security.JwtUtil;
 import com.example.SpringSegurity.util.Estado;
@@ -48,6 +50,7 @@ public class AuthServiceImpl implements AuthService {
     private final EmailService emailService;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final AccountService accountService;
 
 
     @Override
@@ -170,6 +173,8 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
         userRepository.save(user);
+
+        accountService.createAccount(new AccountDtoReq(user.getId()));
 
         String token = UUID.randomUUID().toString();
 

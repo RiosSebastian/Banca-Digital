@@ -7,11 +7,15 @@ import axios from "@/app/utils/axios";
 interface Props {
   open: boolean;
   onClose: () => void;
+  fromAccountId: number | null;
+  onSuccess?: () => void;
 }
 
 export default function TransferModal({
   open,
   onClose,
+  fromAccountId,
+  onSuccess,
 }: Props) {
 
   const [toAccount, setToAccount] =
@@ -22,15 +26,25 @@ export default function TransferModal({
 
   const handleTransfer = async () => {
 
+    if (!fromAccountId) {
+      alert("No se encontró la cuenta de origen");
+      return;
+    }
+
     try {
 
-      await axios.post("/transactions/transfer", {
-        toAccount,
-        amount: Number(amount),
+      await axios.post("/transacciones/transferencia", {
+        cuentaOrigenId: fromAccountId,
+        cbuDestino: toAccount,
+        monto: Number(amount),
       });
 
       alert("Transfer completed");
 
+      setToAccount("");
+      setAmount("");
+
+      onSuccess?.();
       onClose();
 
     } catch {

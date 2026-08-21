@@ -7,7 +7,12 @@ import java.time.LocalDateTime;
 
 @Builder
 public record TransaccionDtoRes(
+        Long id,
+        Double monto,
         LocalDateTime fecha,
-                                TipoTransaccion tipo
+        TipoTransaccion tipo,
+        String descripcion,
+        Long cuentaOrigenId,
+        Long cuentaDestinoId
 ) {
 }

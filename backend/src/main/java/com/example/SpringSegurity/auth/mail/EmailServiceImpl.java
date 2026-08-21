@@ -1,6 +1,7 @@
 package com.example.SpringSegurity.auth.mail;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -12,11 +13,17 @@ public class EmailServiceImpl
 
     private final JavaMailSender mailSender;
 
+    @Value("${app.backend-url:http://localhost:8080}")
+    private String backendUrl;
+
+    @Value("${app.frontend-url:http://localhost:3000}")
+    private String frontendUrl;
+
     @Override
     public void sendVerificationEmail(String to, String token) {
 
         String link =
-                "http://localhost:8080/api/auth/verify?token="
+                backendUrl + "/api/auth/verify?token="
                         + token;
 
         SimpleMailMessage message =
@@ -43,7 +50,7 @@ public class EmailServiceImpl
     public void sendPasswordResetEmail(String to, String token) {
 
         String link =
-                "http://localhost:8080/api/auth/reset-password?token="
+                frontendUrl + "/reset-password?token="
                         + token;
 
         SimpleMailMessage message =

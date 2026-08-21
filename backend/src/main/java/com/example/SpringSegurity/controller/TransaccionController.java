@@ -7,6 +7,7 @@ import com.example.SpringSegurity.entity.UserEntity;
 import com.example.SpringSegurity.service.TransaccionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -45,6 +46,23 @@ public class TransaccionController {
         UserEntity user = (UserEntity) authentication.getPrincipal();
         return ResponseEntity.ok(
                 transaccionService.realizarTransferencia(dto, user.getId())
+        );
+    }
+
+    // =========================================
+    // LISTADO PAGINADO (usado por la pantalla de Transactions)
+    // =========================================
+
+    @GetMapping
+    public ResponseEntity<Page<TransaccionDtoRes>> listar(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String type,
+            Authentication authentication) {
+        UserEntity user = (UserEntity) authentication.getPrincipal();
+        return ResponseEntity.ok(
+                transaccionService.listarPorUsuario(user.getId(), page, size, type)
         );
     }
 

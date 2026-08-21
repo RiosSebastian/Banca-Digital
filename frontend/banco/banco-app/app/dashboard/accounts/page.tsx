@@ -13,7 +13,7 @@ interface Account {
   alias: string;
   cbu: string;
   balance: number;
-  type: string;
+  tipo: string;
 }
 
 export default function AccountsPage() {
@@ -24,38 +24,33 @@ export default function AccountsPage() {
   const [open, setOpen] =
     useState(false);
 
-  useEffect(() => {
+  const [selectedAccountId, setSelectedAccountId] =
+    useState<number | null>(null);
 
+  const loadAccounts = () => {
     axios
       .get("/accounts")
       .then((res) => {
         setAccounts(res.data);
       });
+  };
 
+  useEffect(() => {
+    loadAccounts();
   }, []);
 
   return (
     <div className="space-y-8">
 
-      <div className="flex items-center justify-between">
+      <div>
 
-        <div>
+        <h1 className="text-4xl font-bold">
+          Accounts
+        </h1>
 
-          <h1 className="text-4xl font-bold">
-            Accounts
-          </h1>
-
-          <p className="text-slate-400 mt-2">
-            Manage your bank accounts
-          </p>
-
-        </div>
-
-        <button className="bg-[#14B8A6] hover:bg-[#0D9488] text-black px-6 py-3 rounded-2xl font-semibold transition">
-
-          + New Account
-
-        </button>
+        <p className="text-slate-400 mt-2">
+          Manage your bank accounts
+        </p>
 
       </div>
 
@@ -68,8 +63,11 @@ export default function AccountsPage() {
             alias={account.alias}
             cbu={account.cbu}
             balance={account.balance}
-            type={account.type}
-            onTransfer={() => setOpen(true)}
+            type={account.tipo}
+            onTransfer={() => {
+              setSelectedAccountId(account.id);
+              setOpen(true);
+            }}
           />
 
         ))}
@@ -79,6 +77,8 @@ export default function AccountsPage() {
       <TransferModal
         open={open}
         onClose={() => setOpen(false)}
+        fromAccountId={selectedAccountId}
+        onSuccess={loadAccounts}
       />
 
     </div>

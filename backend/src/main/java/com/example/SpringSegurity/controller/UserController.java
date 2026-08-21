@@ -30,6 +30,13 @@ public class UserController {
     private final UserService userService;
 
 
+    // Usuario actualmente logueado (usado por el frontend tras el login)
+    @GetMapping("/me")
+    public ResponseEntity<UserDTORes> getCurrentUser(Authentication authentication) {
+        UserEntity currentUser = (UserEntity) authentication.getPrincipal();
+        return ResponseEntity.ok(userService.getUser(currentUser.getId()));
+    }
+
     // Buscar usuario por ID
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<UserDTORes>> getUser(@PathVariable Long id) {

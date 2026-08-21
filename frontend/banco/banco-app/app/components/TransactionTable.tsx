@@ -1,15 +1,23 @@
+export type TipoTransaccion =
+  | "DEPOSITO"
+  | "RETIRO"
+  | "TRANSFERENCIA_ENVIADA"
+  | "TRANSFERENCIA_RECIBIDA";
+
 interface Transaction {
   id: number;
-  type: "INCOME" | "EXPENSE";
-  amount: number;
-  description: string;
-  createdAt: string;
-  status: string;
+  monto: number;
+  fecha: string;
+  tipo: TipoTransaccion;
+  descripcion: string;
 }
 
 interface Props {
   transactions: Transaction[];
 }
+
+const isIncome = (tipo: TipoTransaccion) =>
+  tipo === "DEPOSITO" || tipo === "TRANSFERENCIA_RECIBIDA";
 
 export default function TransactionTable({
   transactions,
@@ -27,7 +35,7 @@ export default function TransactionTable({
             </th>
 
             <th className="pb-4">
-              Status
+              Type
             </th>
 
             <th className="pb-4">
@@ -50,42 +58,34 @@ export default function TransactionTable({
             >
 
               <td className="py-5">
-                <div>
-                  <p className="font-medium">
-                    {transaction.description}
-                  </p>
-
-                  <p className="text-sm text-slate-400">
-                    {transaction.type}
-                  </p>
-                </div>
+                <p className="font-medium">
+                  {transaction.descripcion}
+                </p>
               </td>
 
               <td className="py-5">
 
                 <span className="bg-[#14B8A6]/20 text-[#14B8A6] px-3 py-1 rounded-full text-xs">
-                  {transaction.status}
+                  {transaction.tipo}
                 </span>
 
               </td>
 
               <td className="py-5 text-slate-400">
                 {new Date(
-                  transaction.createdAt
+                  transaction.fecha
                 ).toLocaleDateString()}
               </td>
 
               <td
                 className={`py-5 text-right font-bold ${
-                  transaction.type === "INCOME"
+                  isIncome(transaction.tipo)
                     ? "text-[#14B8A6]"
                     : "text-red-400"
                 }`}
               >
-                {transaction.type === "INCOME"
-                  ? "+"
-                  : "-"}
-                ${transaction.amount.toLocaleString()}
+                {isIncome(transaction.tipo) ? "+" : "-"}
+                ${transaction.monto.toLocaleString()}
               </td>
 
             </tr>

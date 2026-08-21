@@ -1,6 +1,7 @@
 package com.example.SpringSegurity.entity;
 
 
+import com.example.SpringSegurity.util.TipoCuenta;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,7 +25,13 @@ public class AccountEntity {
 
     private String alias;
     private String cbu;
+
+    @Builder.Default
     private Double balance = 0.0;
+
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private TipoCuenta tipo = TipoCuenta.AHORRO;
 
     @OneToOne
     private UserEntity user;

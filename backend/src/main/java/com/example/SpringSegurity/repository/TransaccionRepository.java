@@ -1,6 +1,9 @@
 package com.example.SpringSegurity.repository;
 
 import com.example.SpringSegurity.entity.TransaccionEntity;
+import com.example.SpringSegurity.util.TipoTransaccion;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -14,7 +17,7 @@ public interface TransaccionRepository extends JpaRepository<TransaccionEntity, 
            SELECT COALESCE(SUM(t.monto), 0)
            FROM TransaccionEntity t
            WHERE t.cuentaOrigen.id = :accountId
-           AND t.tipo = 'TRANSFERENCIA'
+           AND t.tipo = com.example.SpringSegurity.util.TipoTransaccion.TRANSFERENCIA_ENVIADA
            AND DATE(t.fecha) = CURRENT_DATE
            """)
     Double sumTransfersToday(Long accountId);
@@ -29,7 +32,11 @@ public interface TransaccionRepository extends JpaRepository<TransaccionEntity, 
             SELECT COALESCE(SUM(t.monto),0)
             FROM TransaccionEntity t
             WHERE t.account.user.id = :userId
-            AND t.tipo = com.tu.paquete.TipoTransaccion.DEPOSITO
+            AND (
+                    t.tipo = com.example.SpringSegurity.util.TipoTransaccion.DEPOSITO
+                     OR
+                    t.tipo = com.example.SpringSegurity.util.TipoTransaccion.TRANSFERENCIA_RECIBIDA
+                )
             AND YEAR(t.fecha)=YEAR(CURRENT_DATE)
             AND MONTH(t.fecha)=MONTH(CURRENT_DATE)
             """)
@@ -40,9 +47,9 @@ public interface TransaccionRepository extends JpaRepository<TransaccionEntity, 
             FROM TransaccionEntity t
             WHERE t.account.user.id = :userId
             AND (
-                    t.tipo = com.tu.paquete.TipoTransaccion.RETIRO
+                    t.tipo = com.example.SpringSegurity.util.TipoTransaccion.RETIRO
                      OR
-                    t.tipo = com.tu.paquete.TipoTransaccion.TRANSFERENCIA
+                    t.tipo = com.example.SpringSegurity.util.TipoTransaccion.TRANSFERENCIA_ENVIADA
                 )
             AND YEAR(t.fecha)=YEAR(CURRENT_DATE)
             AND MONTH(t.fecha)=MONTH(CURRENT_DATE)
@@ -59,4 +66,23 @@ public interface TransaccionRepository extends JpaRepository<TransaccionEntity, 
     ORDER BY t.fecha DESC
     """)
     List<TransaccionEntity> findAllByCuentaId(Long cuentaId);
+
+    @Query("""
+    SELECT t FROM TransaccionEntity t
+    WHERE t.account.user.id = :userId
+       OR t.cuentaOrigen.user.id = :userId
+       OR t.cuentaDestino.user.id = :userId
+    ORDER BY t.fecha DESC
+    """)
+    Page<TransaccionEntity> findAllByUsuario(Long userId, Pageable pageable);
+
+    @Query("""
+    SELECT t FROM TransaccionEntity t
+    WHERE (t.account.user.id = :userId
+       OR t.cuentaOrigen.user.id = :userId
+       OR t.cuentaDestino.user.id = :userId)
+       AND t.tipo IN :tipos
+    ORDER BY t.fecha DESC
+    """)
+    Page<TransaccionEntity> findAllByUsuarioAndTipos(Long userId, List<TipoTransaccion> tipos, Pageable pageable);
 }

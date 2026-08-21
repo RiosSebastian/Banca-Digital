@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import axios from "@/app/utils/axios";
 import { useAuth } from "@/app/context/AuthContext";
 
@@ -19,7 +20,7 @@ export default function Login() {
         password,
       });
 
-      await login(res.data.token);
+      await login(res.data.accessToken);
       router.push("/dashboard");
     } catch {
       alert("Credenciales incorrectas");
@@ -50,6 +51,13 @@ export default function Login() {
         >
           Ingresar
         </button>
+
+        <p className="text-sm text-slate-400 text-center mt-4">
+          ¿No tenés cuenta?{" "}
+          <Link href="/register" className="text-[#14B8A6]">
+            Registrarme
+          </Link>
+        </p>
       </div>
     </div>
   );
