@@ -34,7 +34,7 @@ export default function Login() {
 
         <input
           className="w-full p-3 mb-3 bg-gray-700 rounded"
-          placeholder="Email"
+          placeholder="Email" 
           onChange={(e) => setEmail(e.target.value)}
         />
 
@@ -57,6 +57,13 @@ export default function Login() {
           <Link href="/register" className="text-[#14B8A6]">
             Registrarme
           </Link>
+        </p>
+
+
+        <p className="text-center text-sm mb-4">
+            <Link href="/forgot-password" className="text-[#14B8A6]">
+                ¿Olvidaste tu contraseña?
+            </Link>
         </p>
       </div>
     </div>

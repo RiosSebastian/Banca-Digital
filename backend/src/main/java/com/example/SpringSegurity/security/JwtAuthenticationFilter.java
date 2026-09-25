@@ -1,6 +1,5 @@
 package com.example.SpringSegurity.security;
 
-
 import io.micrometer.common.lang.NonNull;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -18,35 +17,47 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-        private final UserDetailsService userDetailsService;
-
-        private final JwtUtil jwtUtil;
+    private final UserDetailsService userDetailsService;
+    private final JwtUtil jwtUtil;
 
     public JwtAuthenticationFilter(UserDetailsService userDetailsService, JwtUtil jwtUtil) {
         this.userDetailsService = userDetailsService;
         this.jwtUtil = jwtUtil;
     }
 
-
     @Override
-        protected void doFilterInternal(
-                @NonNull HttpServletRequest request,
-                @NonNull HttpServletResponse response,
-                @NonNull FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(
+            @NonNull HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain) throws ServletException, IOException {
 
-            String authorization = request.getHeader("Authorization");
-            if (authorization != null && authorization.startsWith("Bearer ")) {
-                String token = authorization.substring(7);
+        String authorization = request.getHeader("Authorization");
+
+        if (authorization != null && authorization.startsWith("Bearer ")) {
+            String token = authorization.substring(7);
+
+            try {
                 String subject = jwtUtil.validateToken(token);
                 UserDetails user = userDetailsService.loadUserByUsername(subject);
+
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         user,
                         null,
                         user.getAuthorities()
                 );
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            }
-            filterChain.doFilter(request, response);
-        }
-    }
 
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            } catch (Exception e) {
+                // Token inválido, vencido, o usuario inexistente:
+                // no autenticamos y dejamos que la cadena siga.
+                // Los endpoints públicos van a funcionar igual;
+                // los protegidos van a rechazar con 401 más adelante,
+                // en vez de romper con un 500 acá.
+                SecurityContextHolder.clearContext();
+            }
+        }
+
+        filterChain.doFilter(request, response);
+    }
+}
